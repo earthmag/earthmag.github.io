@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EarthMag</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * {   cursor: none !important;
+margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; color: #212121; background-color: #FAFAFA; cursor: none; /* hide default cursor */ }
+
+    a, button {
+      cursor: none !important; /* remove default pointer */
+    }
+
+    .custom-cursor {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(46,125,50,0.8);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s ease-out, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+      z-index: 3000;
+    }
+
+    .custom-cursor.click {
+      transform: translate(-50%, -50%) scale(0.8);
+      background-color: rgba(0,150,136,0.2);
+    }
+
+    .custom-cursor.hidden {
+      opacity: 0;
+    }
+
+    .custom-cursor.nav-hover {
+      transform: translate(-50%, -50%) scale(1.6);
+      background-color: rgba(0,150,136,0.1);
+      border-color: rgba(255, 255, 255,0.1);
+    }
+
+    nav {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      max-width: 90%;
+      padding: 14px 28px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    nav .logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      font-size: 26px;
+      color: #2E7D32;
+      transition: color 0.3s ease;
+    }
+    nav .logo:hover {
+        color:white;
+    }
+    nav ul { display: flex; list-style: none; }
+    nav ul li { margin-left: 20px; }
+    nav ul li a {
+      color: white; text-decoration: none; font-weight: 500; transition: all 0.3s ease;
+      padding: 8px 14px; border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+    }
+    nav ul li a:hover {
+      color: black;
+      background: rgba(255, 255, 255, 0.65);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.4);
+      transform: translateY(-2px);
+    }
+
+    header {
+      height: 100vh; width: 100%;
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 20px;
+    }
+    header video {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; z-index: -1;
+    }
+    header .overlay {
+      position: relative; z-index: 1;
+      max-width: 800px;
+    }
+    header h1 { font-family: 'Playfair Display', serif; font-size: 72px; margin-bottom: 20px; color: white;; }
+    header p { font-family: 'Inter', sans-serif; font-size: 22px; margin-bottom: 30px; color:white; }
+    header a {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #2E7D32, #009688);
+      color: #fff;
+      padding: 12px 30px; border-radius: 30px;
+      text-decoration: none; font-weight: bold;
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.6);
+      transition: background 0.3s, box-shadow 0.3s, transform 0.2s ease, box-shadow 0.2s ease;
+      display: inline-block;
+    }
+    header a:hover {
+      background: linear-gradient(135deg, #256029, #00796B);
+      box-shadow: 0 12px 32px rgba(37,96,41,0.25);
+      transform: translateY(-2px);
+    }
+
+    section {
+      padding: 100px 40px;
+      background-color: #fff;
+      transition: background-color 0.3s;
+    }
+    section:nth-of-type(even) {
+      background-color: #f9f9f9;
+    }
+    section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      color: #2E7D32;
+      border-bottom: 2px solid #2E7D32;
+      padding-bottom: 8px;
+      max-width: max-content;
+    }
+    section p {
+      font-family: 'Inter', sans-serif;
+      max-width: 800px;
+      margin-bottom: 20px;
+      line-height: 1.8;
+      font-size: 18px;
+      color: #444;
+    }
+
+    form input[type="text"],
+    form input[type="email"],
+    form textarea {
+      padding: 10px;
+      margin: 5px;
+      width: 250px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    form textarea {
+      width: 520px;
+      height: 100px;
+      resize: vertical;
+    }
+    form input[type="text"]:focus,
+    form input[type="email"]:focus,
+    form textarea:focus {
+      border-color: #2E7D32;
+      box-shadow: 0 0 8px rgba(46, 125, 50, 0.6);
+      outline: none;
+    }
+    form button {
+      font-family: 'Inter', sans-serif;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #2E7D32, #009688);
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    form button:hover {
+      background: linear-gradient(135deg, #256029, #00792c);
+    }
+
+    .footer {
+      background: #111;
+      text-align: center;
+      padding: 30px;
+      color: #ccc;
+      font-size: 14px;
+    }
+    .footer a {
+      color: #ccc;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer a:hover {
+      color: #256a00;
+    }
+
+    @media (max-width: 900px) {
+      nav { flex-wrap: wrap; }
+      nav ul {
+        flex-direction: column;
+        background: rgba(255,255,255,0.25);
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        width: 100%;
+        padding: 20px;
+        border-radius: 12px;
+      }
+      nav ul li { margin: 10px 0; }
+    }
+
+    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+    .modal-content { background: #fff; margin: 10% auto; padding: 30px; border-radius: 12px; max-width: 600px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .modal-content h2 { font-family: 'Playfair Display', serif; color: #2E7D32; margin-bottom: 20px; }
+    .modal-content input, .modal-content textarea { width: 100%; margin-bottom: 12px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Inter', sans-serif; }
+    .modal-content button { background: linear-gradient(135deg, #2E7D32, #009688); color: #fff; border: none; border-radius: 30px; padding: 10px 20px; cursor: pointer; }
+    .modal-content button:hover { background: linear-gradient(135deg, #256029, #00796B); }
+    .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    .close:hover { color: #000; }
+    nav.scrolled {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border: 1px solid rgba(0,0,0,0.1);
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+nav.scrolled ul li a {
+  color: #212121;
+}
+nav.scrolled ul li a:hover {
+    background: rgba(94, 94, 94, 0.15);
+    /* color:white; */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.4);
+    transform: translateY(-2px);
+    transition:0.5s
+}
+nav.scrolled .logo:hover {
+color:grey;
+transition: 0.5s;
+}
+
+
+
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="logo" id="logo">EarthMag</div>
+    <ul>
+      <li><a href="facts.html">Facts</a></li>
+      <li><a href="data.html">Data</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="intern.html">Internships</a></li>
+      <li><a href="mailto:inquire.earthmagazine@gmail.com?subject=Inquiry%20from%20EarthMag%20Website&body=Hello%20EarthMag%20Team%2C%0A%0AI%20would%20like%20to%20learn%20more%20about%20your%20initiatives.%0A%0AThank%20you%2C%0A[Your%20Name]">Contact</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="journal.html">Journal</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <header>
+    <video id="bg-video" autoplay muted loop playsinline>
+    <source src="bgvid.mp4" type="video/mp4">
+    </video>    
+
+    <div class="overlay">
+      <h1>EarthMag</h1>
+    <p>Exploring Earth Systems, Energy, and Sustainability for a Better Future.</p>
+      <a href="#internships" id="openFormBtn">Apply to Write</a>
+    </div>
+  </header>
+
+  <!-- Sections -->
+  <section id="facts">
+    <h2>Energy and Environment Facts</h2>git
+    <p>Key insights and data about sustainability, energy storage, and environmental engineering.</p>
+  </section>
+
+  <section id="companies">
+    <h2>Companies</h2>
+    <p>Tracking leading innovators and organizations in energy and earth systems.</p>
+  </section>
+
+  <section id="funding">
+    <h2>Funding</h2>
+    <p>Discover funding opportunities, grants, and programs supporting sustainability research.</p>
+  </section>
+
+  <section id="about">
+    <h2>About Us</h2>
+    <p>EarthMag is a journal dedicated to energy, sustainability, and environmental science. Our mission is to amplify ideas and research that drive the transition to a sustainable future.</p>
+  </section>
+
+  <section id="internships">
+    <h2>Internships & Apply to Write</h2>
+    <p>We welcome student and professional writers to contribute to EarthMag. Share your voice on energy, sustainability, and environmental engineering.</p>
+    <button id="openFormBtn">Apply Now</button>
+  </section>
+
+
+  <section id="blog">
+    <h2>Blog</h2>
+    <p>Latest articles, stories, and insights on sustainability, energy, and earth systems.</p>
+  </section>
+
+  <section id="publishing">
+    <h2>Publishing</h2>
+    <p>EarthMag publishes articles from students, researchers, and professionals worldwide. Join us in shaping the conversation.</p>
+  </section>
+
+  <!-- Footer -->
+<div id="contact" style="background-color: #f2f2f2; padding: 40px 20px; font-family: 'Arial', sans-serif; color: #333;">
+  <div style="max-width: 1000px; margin: auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px;">
+
+    <!-- Contact Info -->
+    <div style="flex: 1; min-width: 220px;">
+      <h3 style="color: #2E7D32; font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 15px;">Contact Us</h3>
+      <p style="margin: 5px 0; font-size: 16px;">Email: <a href="mailto:inquire.earthmagazine@gmail.com" style="color: #2E7D32; text-decoration: none;">inquire.earthmagazine@gmail.com</a></p>
+      <p style="margin: 5px 0; font-size: 16px;">Phone: <a href="tel:+911234567890" style="color: #2E7D32; text-decoration: none;">+91 123 456 7890</a></p>
+      <p style="margin: 5px 0; font-size: 16px;">Address: 123 Sustainability Lane, Kolkata, India</p>
+    </div>
+
+    <!-- Stay Connected -->
+    <div style="flex: 1; min-width: 220px;">
+      <h3 style="color: #2E7D32; font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 15px;">Stay Connected</h3>
+      <p style="margin: 5px 0; font-size: 16px;">Follow us for updates on sustainability:</p>
+      <div style="display: flex; gap: 15px; margin-top: 10px;">
+        <a href="https://facebook.com" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">&#x1F464;</a>
+        <a href="https://twitter.com" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">&#x1F426;</a>
+        <a href="https://instagram.com" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">&#x1F33F;</a>
+        <a href="https://linkedin.com" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">&#x1F465;</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer Bottom -->
+  <div style="text-align: center; margin-top: 30px; font-size: 14px; color: #666;">
+    <p>© 2025 EarthMag. All Rights Reserved.</p>
+  </div>
+</div>  <div id="applyModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Apply to Write</h2>
+      <form>
+        <input type="text" placeholder="Your Name" required />
+        <input type="email" placeholder="Your Email" required />
+        <textarea placeholder="Why do you want to write for us?" required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="custom-cursor" id="customCursor"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+          function goFullScreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+      elem.msRequestFullscreen();
+    }
+  }
+    goFullScreen();
+        } );
+    
+        // Attempt to play video on load
+        document.body.onclick = () => {
+            const video = document.getElementById('bg-video');
+            video.play();
+            document.body.onclick = null; // Remove listener after first click
+    }
+      const video = document.getElementById('bg-video');
+      video.play();
+      function tryPlay() {
+        video.play().catch(() => {
+          // If still blocked, wait for user interaction
+          const forcePlay = () => {
+            video.play();
+            document.removeEventListener('click', forcePlay);
+          };
+          document.addEventListener('click', forcePlay);
+        });
+      }
+
+
+      tryPlay();
+
+      const modal = document.getElementById('applyModal');
+      const btn = document.getElementById('openFormBtn');
+      const span = document.querySelector('.close');
+      btn.onclick = () => modal.style.display = 'block';
+      span.onclick = () => modal.style.display = 'none';
+      window.onclick = (event) => { if(event.target == modal) modal.style.display = 'none'; }
+      const logo = document.getElementById('logo');
+      logo.onclick = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+      const navbar = document.querySelector("nav")
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > (window.innerHeight-50) || window.scrollY < 0) {
+            navbar.classList.add("scrolled");
+        } else {
+            navbar.classList.remove("scrolled");
+        }
+      });
+
+      const customCursor = document.getElementById('customCursor');
+      document.addEventListener('mousemove', e => {
+        customCursor.style.left = e.clientX + 'px';
+        customCursor.style.top = e.clientY + 'px';
+      });
+      document.addEventListener('mousedown', () => {
+        customCursor.classList.add('click');
+      });
+      document.addEventListener('mouseup', () => {
+        customCursor.classList.remove('click');
+      });
+
+      const interactiveElements = document.querySelectorAll('a, button, nav ul li a');
+      interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          if (el.closest('nav')) {
+            customCursor.classList.add('nav-hover');
+          }
+        });
+        el.addEventListener('mouseleave', () => {
+          customCursor.classList.remove('nav-hover');
+        });
+      });
+</script>
+</body>
+</html>
