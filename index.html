@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>EarthMag</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
   <link rel="icon" type="image/png" href="favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
@@ -14,6 +16,10 @@ margin: 0; padding: 0; box-sizing: border-box; }
     a, button {
       cursor: none !important; /* remove default pointer */
     }
+.footicon:hover {
+  transform: scale(1.2);
+  color: #1d1d1d;
+}
 
     .custom-cursor {
       width: 18px;
@@ -407,11 +413,18 @@ transition: 0.5s;
       <h3 style="color: #2E7D32; font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 15px;">Stay Connected</h3>
       <p style="margin: 5px 0; font-size: 16px;">Follow us for updates on sustainability:</p>
       <div style="display: flex; gap: 15px; margin-top: 10px;">
-        <a href="https://facebook.com" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">&#x1F464;</a>
-        <a href="https://twitter.com" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">&#x1F426;</a>
-        <a href="https://instagram.com" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">&#x1F33F;</a>
-        <a href="https://linkedin.com" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">&#x1F465;</a>
-      </div>
+        <a href="https://facebook.com/earthmag" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">
+          <i class="fab fa-facebook footicon"></i>
+        </a>
+        <a href="https://twitter.com/earthmag" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">
+          <i class="fab fa-twitter footicon"></i>
+        </a>
+        <a href="https://instagram.com/earthmagg" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">
+          <i class="fab fa-instagram footicon"></i>
+        </a>
+        <a href="https://www.linkedin.com/company/earthmag" target="_blank" style="font-size: 24px; color: #2E7D32; text-decoration: none;">
+          <i class="fab fa-linkedin footicon"></i>
+        </a>      </div>
     </div>
 
   </div>
@@ -612,6 +625,17 @@ modalForm.addEventListener('submit', async (e) => {
     formResponse.style.display = 'block';
   }
 });
+const hideCursorElements = document.querySelectorAll('input, textarea, button, a, iframe');
+
+hideCursorElements.forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.classList.add('hidden');
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.classList.remove('hidden');
+  });
+});
+
 </script>
 </body>
 </html>
