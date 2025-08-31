@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Environmental Mindmap - EarthMag</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+    background: black;
+    background-size: cover;
+    overflow: hidden;
+  }
+  svg {
+    width: 100vw;
+    height: 100vh;
+  }
+
+  /* Nodes */
+  .node circle {
+    stroke: #fff;
+    stroke-width: 1.5px;
+    cursor: pointer;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+    transition: all 0.3s ease;
+  }
+  .node circle:hover {
+    r: 50px;
+    filter: drop-shadow(0 0 20px rgba(46,125,50,0.8));
+  }
+
+  /* Links */
+  .link {
+    stroke: rgba(255,255,255,0.5);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    transition: stroke 0.2s;
+  }
+  .link:hover {
+    stroke: #2E7D32;
+    stroke-opacity: 0.9;
+  }
+
+  /* Text */
+  text {
+    font-size: 12px;
+    pointer-events: none;
+    fill: #fff;
+    font-weight: 600;
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute;
+    padding: 6px 12px;
+    background: rgba(46,125,50,0.9);
+    border-radius: 8px;
+    pointer-events: none;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(0,0,0,0.5);
+    transition: opacity 0.2s;
+  }
+
+  /* Search bar */
+  #search {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    z-index: 10;
+  }
+
+  /* Modal */
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.modal-content {
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  border-radius: 25px;
+  padding: 35px 30px;
+  width: 400px;
+  max-width: 90%;
+  color: #fff;
+  box-shadow: 0 12px 36px rgba(46, 125, 50, 0.45), 0 8px 24px rgba(0,0,0,0.25);
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-content:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 48px rgba(46, 125, 50, 0.55), 0 12px 36px rgba(0,0,0,0.3);
+}
+
+/* Close button */
+#modal-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #2E7D32;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+#modal-close:hover {
+  color: #fff;
+  transform: rotate(180deg);
+}
+
+/* Modal title */
+#modal-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 26px;
+  margin-bottom: 12px;
+  color: #2E7D32;
+  text-shadow: 0 0 10px rgba(46,125,50,0.9);
+}
+
+/* Modal info */
+#modal-info {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #ffffffcc;
+  margin-bottom: 25px;
+  text-align: justify;
+}
+
+/* Learn more link/button */
+#modal-link {
+  display: inline-block;
+  padding: 12px 26px;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 20px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 6px 20px rgba(46,125,50,0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+#modal-link:hover {
+  transform: translateY(-2px);
+}
+</style>
+</head>
+<body>
+
+<div class="tooltip" style="opacity:0;"></div>
+<input id="search" type="text" placeholder="Search nodes...">
+
+<div id="modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span id="modal-close">&times;</span>
+    <h2 id="modal-title"></h2>
+    <p id="modal-info"></p>
+    <a id="modal-link" href="#" target="_blank">Learn More</a>
+  </div>
+</div>
+
+<svg></svg>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+const svg = d3.select("svg");
+const width = window.innerWidth;
+const height = window.innerHeight;
+const tooltip = d3.select(".tooltip");
+
+// Nodes and links
+const nodes = [
+  { id: "Climate Change", group: "topic", info: "Global warming and climate shifts.", url: "https://en.wikipedia.org/wiki/Climate_change" },
+  { id: "Renewable Energy", group: "technology", info: "Solar, wind, etc.", url: "https://en.wikipedia.org/wiki/Renewable_energy" },
+  { id: "Solar Power", group: "technology", info: "Harnessing energy from sunlight.", url: "https://en.wikipedia.org/wiki/Solar_power" },
+  { id: "Wind Power", group: "technology", info: "Using wind turbines.", url: "https://en.wikipedia.org/wiki/Wind_power" },
+  { id: "Tesla", group: "company", info: "EV and clean energy company.", url: "https://www.tesla.com" },
+  { id: "UNEP", group: "organization", info: "United Nations Environment Programme.", url: "https://www.unep.org" },
+  { id: "Deforestation", group: "phenomenon", info: "Loss of forests.", url: "https://en.wikipedia.org/wiki/Deforestation" },
+  { id: "Carbon Capture", group: "technology", info: "Capture CO2 from air.", url: "https://en.wikipedia.org/wiki/Carbon_capture_and_storage" },
+  { id: "Ocean Pollution", group: "phenomenon", info: "Contamination of oceans.", url: "https://en.wikipedia.org/wiki/Ocean_pollution" },
+  { id: "Climate Adaptation", group: "topic", info: "Adjusting systems for climate impacts.", url: "https://en.wikipedia.org/wiki/Climate_adaptation" }
+];
+
+const links = [
+  { source: "Climate Change", target: "Renewable Energy" },
+  { source: "Renewable Energy", target: "Solar Power" },
+  { source: "Renewable Energy", target: "Wind Power" },
+  { source: "Solar Power", target: "Tesla" },
+  { source: "Wind Power", target: "Tesla" },
+  { source: "Climate Change", target: "Deforestation" },
+  { source: "Climate Change", target: "Ocean Pollution" },
+  { source: "Climate Change", target: "Climate Adaptation" },
+  { source: "Climate Adaptation", target: "UNEP" },
+  { source: "Carbon Capture", target: "Climate Change" },
+  { source: "Carbon Capture", target: "Tesla" }
+];
+
+// Force simulation
+const simulation = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d => d.id).distance(180))
+  .force("charge", d3.forceManyBody().strength(-250))
+  .force("center", d3.forceCenter(width / 2, height / 2));
+
+// Draw links
+const link = svg.selectAll(".link").data(links).join("line").attr("class","link");
+
+// Draw nodes
+const node = svg.selectAll(".node").data(nodes).join("g").attr("class","node")
+  .call(d3.drag()
+    .on("start", dragstarted)
+    .on("drag", dragged)
+    .on("end", dragended)
+  );
+
+// Append circles and text
+node.append("circle")
+  .attr("r", 40)
+  .on("mouseover", (event,d) => {
+    tooltip.transition().duration(150).style("opacity",1);
+    tooltip.html(`${d.id} (${d.group})`).style("left",(event.pageX+10)+"px").style("top",(event.pageY-15)+"px");
+  })
+  .on("mouseout", () => tooltip.transition().duration(150).style("opacity",0))
+  .on("click", (event,d) => {
+    document.getElementById("modal-title").textContent = d.id;
+    document.getElementById("modal-info").textContent = d.info;
+    document.getElementById("modal-link").href = d.url;
+    document.getElementById("modal").style.display = "flex";
+  });
+
+node.append("text")
+  .text(d => d.id)
+  .attr("text-anchor","middle")
+  .attr("dy",5);
+
+// Search functionality
+d3.select("#search").on("input", function() {
+  const query = this.value.toLowerCase();
+  node.select("circle")
+    .transition().duration(200)
+    .attr("fill", d => d.id.toLowerCase().includes(query) ? "#2E7D32" : "rgba(255,255,255,0.9)");
+  node.transition().duration(200)
+    .style("opacity", d => query==="" ? 1 : d.id.toLowerCase().includes(query) ? 1 : 0.3);
+  link.transition().duration(200)
+    .style("opacity", d => query==="" ? 0.6 : (d.source.id.toLowerCase().includes(query)||d.target.id.toLowerCase().includes(query)) ? 0.8 : 0.1);
+});
+
+// Simulation tick
+simulation.on("tick", () => {
+  link.attr("x1",d=>d.source.x)
+      .attr("y1",d=>d.source.y)
+      .attr("x2",d=>d.target.x)
+      .attr("y2",d=>d.target.y);
+  node.attr("transform", d => `translate(${d.x},${d.y})`);
+});
+
+// Drag functions
+function dragstarted(event,d){ if(!event.active) simulation.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; }
+function dragged(event,d){ d.fx=event.x; d.fy=event.y; }
+function dragended(event,d){ if(!event.active) simulation.alphaTarget(0); d.fx=null; d.fy=null; }
+
+// Modal close
+document.getElementById("modal-close").onclick = ()=>document.getElementById("modal").style.display="none";
+window.onclick = (event)=>{ if(event.target==document.getElementById("modal")) document.getElementById("modal").style.display="none"; };
+
+// Responsive
+window.addEventListener("resize", ()=>{
+  svg.attr("width",window.innerWidth).attr("height",window.innerHeight);
+  simulation.force("center",d3.forceCenter(window.innerWidth/2,window.innerHeight/2));
+  simulation.alpha(1).restart();
+});
+</script>
+</body>
+</html>

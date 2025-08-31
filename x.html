@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Environmental Mindmap - EarthMag Style</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  background: black;
+  background-size: cover;  /* Ensures the image fills the screen */
+}  
+svg {
+    width: 100vw;
+    height: 100vh;
+  }
+  .node circle {
+    stroke: #fff;
+    stroke-width: 1.5px;
+    cursor: pointer;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+    transition: r 0.2s, filter 0.2s;
+  }
+  .node circle:hover {
+    r: 50px;
+    filter: drop-shadow(0 0 15px rgba(255,255,255,0.7));
+  }
+  
+  .link {
+    stroke: #aaa;
+    stroke-opacity: 0.5;
+    stroke-width: 2px;
+    transition: stroke 0.2s;
+  }
+  .link:hover {
+    stroke: #fff;
+    stroke-opacity: 0.8;
+  }
+  text {
+    font-size: 12px;
+    pointer-events: none;
+    fill: #fff;
+    font-weight: 500;
+  }
+  .tooltip {
+    position: absolute;
+    padding: 6px 12px;
+    background: rgba(30,30,30,0.95);
+    border-radius: 6px;
+    pointer-events: none;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    transition: opacity 0.2s;
+  }
+.popup {
+  position: absolute;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.9);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  pointer-events: auto;
+  display: none;
+  z-index: 20;
+}
+.popup button {
+  margin-top: 6px;
+  background: #444;
+  color: #fff;
+  border: none;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+/* Modal overlay */
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 2000; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%;
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Modal content */
+.modal-content {
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(15px) saturate(180%);
+  border-radius: 20px;
+  padding: 30px 25px;
+  width: 350px;
+  max-width: 90%;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+}
+
+/* Close button */
+#modal-close {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #ffffff;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+/* Title */
+#modal-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 50px;
+  margin-bottom: 15px;
+  color:white;
+}
+
+/* Description */
+#modal-info {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+/* Link button */
+#modal-link {
+  display: inline-block;
+  padding: 10px 20px;
+  background: white;
+  color: black;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.3s, transform 0.2s;
+}
+#modal-link:hover {
+  transform: translateY(-2px);
+}
+</style>
+</head>
+<body>
+<div class="tooltip" style="opacity:0;"></div>
+<input id="search" type="text" placeholder="Search nodes..." 
+       style="position:absolute; bottom:0; left:15%; transform:translateX(-50%);
+              padding:6px 12px; font-size:14px; border-radius:4px; border:none;
+              outline:none; box-shadow:0 0 10px rgba(0,0,0,1); z-index:10; background-color: black; color: white; font-weight: bolder;   font-family: 'Tourney', sans-serif !important;">
+<div class="popup" style="opacity:0;"></div>
+<!-- Modal -->
+<div id="modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span id="modal-close">&times;</span>
+    <h2 id="modal-title">Node Title</h2>
+    <p id="modal-info">Node description goes here.</p>
+    <a id="modal-link" href="#" target="_blank">Learn More</a>
+  </div>
+</div></div><svg></svg>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+const svg = d3.select("svg");
+const width = window.innerWidth;
+const height = window.innerHeight;
+const tooltip = d3.select(".tooltip");
+const padding = 50; // so nodes don't overlap edges
+
+// Data for the mindmap
+const nodes = [
+  { id: "Climate Change", group: "topic", info: "Climate change refers to long-term alterations in global or regional climate patterns. It is driven by natural processes and human activities, particularly greenhouse gas emissions. Impacts include rising temperatures, shifting weather patterns, melting glaciers, and extreme weather events. Addressing it requires coordinated global mitigation and adaptation strategies.", url: "https://en.wikipedia.org/wiki/Climate_change" },
+  { id: "Renewable Energy", group: "technology", info: "Renewable energy comes from natural sources that are continually replenished, such as sunlight, wind, water, and geothermal heat. It provides a sustainable alternative to fossil fuels, reducing carbon emissions. Renewable energy technologies include solar panels, wind turbines, hydroelectric dams, and geothermal systems. Adoption of these technologies is crucial for achieving climate goals.", url: "https://en.wikipedia.org/wiki/Renewable_energy" },
+  { id: "Solar Power", group: "technology", info: "Solar power converts sunlight into electricity using photovoltaic cells or solar thermal systems. It is one of the fastest-growing forms of renewable energy. Solar power can be deployed at residential, commercial, and utility scales. It helps reduce reliance on fossil fuels, lowers greenhouse gas emissions, and promotes energy independence.", url: "https://en.wikipedia.org/wiki/Solar_power" },
+  { id: "Wind Power", group: "technology", info: "Wind power generates electricity by harnessing the kinetic energy of wind through turbines. It is a clean, renewable energy source with low operational emissions. Wind farms can be located onshore or offshore, depending on wind availability. Wind energy contributes significantly to reducing dependence on fossil fuels and combating climate change.", url: "https://en.wikipedia.org/wiki/Wind_power" },
+  { id: "Tesla", group: "company", info: "Tesla is a pioneering company in electric vehicles and sustainable energy solutions. It produces electric cars, solar energy products, and energy storage systems. Tesla aims to accelerate the world's transition to sustainable energy. Its innovations influence the automotive industry and renewable energy adoption globally.", url: "https://www.tesla.com" },
+  { id: "UNEP", group: "organization", info: "The United Nations Environment Programme (UNEP) coordinates global environmental efforts. It assists countries in implementing sustainable policies and practices. UNEP addresses issues like climate change, biodiversity, pollution, and resource management. It provides research, policy guidance, and advocacy for environmental protection worldwide.", url: "https://www.unep.org" },
+  { id: "Deforestation", group: "phenomenon", info: "Deforestation is the large-scale removal of forests, often for agriculture, logging, or urban expansion. It leads to biodiversity loss, soil degradation, and increased greenhouse gas emissions. Forests play a crucial role in carbon sequestration and regulating ecosystems. Reducing deforestation is essential for climate mitigation and ecosystem preservation.", url: "https://en.wikipedia.org/wiki/Deforestation" },
+  { id: "Carbon Capture", group: "technology", info: "Carbon capture refers to technologies that capture carbon dioxide emissions from industrial sources or the atmosphere. The captured CO2 is stored or utilized to prevent it from entering the atmosphere. Carbon capture is essential for limiting global warming and achieving net-zero emission goals. It complements renewable energy solutions in climate mitigation.", url: "https://en.wikipedia.org/wiki/Carbon_capture_and_storage" },
+  { id: "Ocean Pollution", group: "phenomenon", info: "Ocean pollution involves the introduction of harmful substances like plastics, chemicals, and untreated waste into marine environments. It threatens marine biodiversity, food security, and human health. Common sources include industrial runoff, oil spills, and littering. Addressing ocean pollution requires global cooperation and sustainable waste management practices.", url: "https://en.wikipedia.org/wiki/Ocean_pollution" },
+  { id: "Climate Adaptation", group: "topic", info: "Climate adaptation involves adjusting natural, social, and economic systems to minimize the adverse impacts of climate change. Strategies include building resilient infrastructure, sustainable agriculture, and disaster risk management. Adaptation complements mitigation efforts by reducing vulnerability. It is essential for protecting communities and ecosystems worldwide.", url: "https://en.wikipedia.org/wiki/Climate_adaptation" },
+  { id: "Battery Storage", group: "technology", info: "Battery storage systems store electricity generated from renewable sources for later use. They help stabilize the grid, balance supply and demand, and improve energy reliability. Technologies include lithium-ion, flow batteries, and emerging solid-state batteries. Energy storage is crucial for scaling renewable energy deployment.", url: "https://en.wikipedia.org/wiki/Energy_storage" },
+  { id: "Electric Vehicles", group: "technology", info: "Electric vehicles (EVs) are powered by electric motors instead of internal combustion engines. EVs reduce greenhouse gas emissions and reliance on fossil fuels. They include cars, buses, and trucks, often paired with renewable energy sources. EV adoption is a key component of sustainable transportation.", url: "https://en.wikipedia.org/wiki/Electric_vehicle" },
+  { id: "Reforestation", group: "phenomenon", info: "Reforestation involves planting trees to restore degraded or deforested land. It helps sequester carbon, restore biodiversity, prevent soil erosion, and improve air quality. Large-scale reforestation is part of global climate mitigation strategies. Community participation enhances long-term success.", url: "https://en.wikipedia.org/wiki/Reforestation" },
+  { id: "Sustainable Agriculture", group: "topic", info: "Sustainable agriculture practices aim to produce food while preserving environmental resources. Techniques include crop rotation, organic farming, reduced chemical use, and water-efficient irrigation. These methods enhance soil health, biodiversity, and resilience to climate change. Sustainable agriculture supports both people and the planet.", url: "https://en.wikipedia.org/wiki/Sustainable_agriculture" },
+  { id: "Geoengineering", group: "technology", info: "Geoengineering refers to deliberate interventions in Earth’s climate system to counteract climate change. Methods include solar radiation management and carbon dioxide removal. These techniques are controversial due to risks and uncertainties. Geoengineering is considered a potential supplement, not a replacement, for emission reductions.", url: "https://en.wikipedia.org/wiki/Geoengineering" },
+  { id: "Plastic Reduction", group: "phenomenon", info: "Plastic reduction involves minimizing the use and disposal of single-use plastics to prevent environmental pollution. Strategies include recycling, reusable alternatives, and policy regulations. Reducing plastic helps protect oceans, wildlife, and human health. Public awareness and industry engagement are essential for success.", url: "https://en.wikipedia.org/wiki/Plastic_pollution" },
+  { id: "Hydroelectric Power", group: "technology", info: "Hydroelectric power generates electricity by harnessing the energy of flowing water through dams or run-of-river systems. It is a renewable energy source with low operational emissions. Hydropower provides baseload energy, water management benefits, and supports regional development. Sustainable planning is critical to minimize ecological impacts.", url: "https://en.wikipedia.org/wiki/Hydroelectricity" },
+  { id: "NGOs", group: "organization", info: "Environmental NGOs are non-governmental organizations dedicated to protecting nature and promoting sustainable practices. They engage in research, advocacy, education, and policy development. NGOs play a crucial role in climate action, conservation, and community engagement globally. Collaboration amplifies their impact.", url: "https://en.wikipedia.org/wiki/Environmental_organization" },
+  { id: "Air Pollution", group: "phenomenon", info: "Air pollution is the presence of harmful substances in the atmosphere, including gases, particulates, and biological molecules. It causes health issues, environmental degradation, and climate impacts. Major sources include transportation, industry, and agriculture. Monitoring and regulation are vital to reduce air pollution.", url: "https://en.wikipedia.org/wiki/Air_pollution" },
+  { id: "Sustainability", group: "topic", info: "Sustainability is the ability to meet present needs without compromising the ability of future generations to meet their own needs. It encompasses environmental, social, and economic dimensions. Sustainable practices aim to balance these aspects, promoting long-term resilience and equity. The concept is central to addressing global challenges like climate change and resource depletion.", url: "https://en.wikipedia.org/wiki/Sustainability" },
+  { id: "Circular Economy", group: "topic", info: "A circular economy is an economic system aimed at eliminating waste and promoting resource efficiency. It emphasizes reuse, recycling, and sustainable product design. This approach reduces environmental impact, conserves resources, and supports sustainable growth. Circular economy practices are increasingly adopted by industries worldwide.", url: "https://en.wikipedia.org/wiki/Circular_economy" }
+
+];
+
+const links = [
+  { source: "Climate Change", target: "Renewable Energy" },
+  { source: "Climate Change", target: "Deforestation" },
+  { source: "Climate Change", target: "Climate Adaptation" },
+  { source: "Renewable Energy", target: "Solar Power" },
+  { source: "Renewable Energy", target: "Wind Power" },
+  { source: "Solar Power", target: "Tesla" },
+  { source: "Wind Power", target: "Tesla" },
+  { source: "Tesla", target: "Electric Vehicles" },
+  { source: "Tesla", target: "Battery Storage" },
+  { source: "Climate Adaptation", target: "UNEP" },
+  { source: "Carbon Capture", target: "Climate Change" },
+  { source: "Carbon Capture", target: "Renewable Energy" },
+  { source: "Deforestation", target: "Reforestation" },
+  { source: "Reforestation", target: "Sustainable Agriculture" },
+  { source: "Plastic Reduction", target: "Ocean Pollution" },
+  { source: "Geoengineering", target: "Climate Change" },
+  { source: "Hydroelectric Power", target: "Renewable Energy" },
+  { source: "NGOs", target: "UNEP" },
+  { source: "Air Pollution", target: "Climate Change" },
+  { source: "Circular Economy", target: "Sustainability" },
+{ source: "Sustainable Agriculture", target: "Sustainability" },
+  { source: "Plastic Reduction", target: "Climate Adaptation" }
+];
+
+// Color scheme
+const colorMap = {
+  "topic": "#ffb74d",         // warm orange
+  "technology": "#4dd0e1",    // cyan
+  "company": "#81c784",       // green
+  "organization": "#ba68c8",  // purple
+  "phenomenon": "#e57373"     // red
+};
+
+// Force simulation
+const simulation = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d => d.id).distance(290))
+  .force("charge", d3.forceManyBody().strength(-150))
+  .force("center", d3.forceCenter(width / 2, height / 2));
+
+// Draw links
+const link = svg.selectAll(".link")
+  .data(links)
+  .join("line")
+  .attr("class", "link");
+
+// Draw nodes
+const node = svg.selectAll(".node")
+  .data(nodes)
+  .join("g")
+  .attr("class", "node")
+  .call(d3.drag()
+    .on("start", dragstarted)
+    .on("drag", dragged)
+    .on("end", dragended)
+  );
+
+node.append("circle")
+  .attr("r", 40)
+//   .attr("fill", d => colorMap[d.group] || "#ccc")
+  .on("mouseover", (event, d) => {
+    tooltip.transition().duration(150).style("opacity", 1);
+    tooltip.html(`${d.id} <span style="color:#aaa">(${d.group})</span>`)
+           .style("left", (event.pageX + 10) + "px")
+           .style("top", (event.pageY - 15) + "px");
+  })
+  .on("mouseout", () => tooltip.transition().duration(150).style("opacity", 0))
+node.select("circle")
+  .on("click", (event, d) => {
+    if(d.url) {
+      window.open(d.url, "_blank");  // opens the link in a new tab
+    }
+  });
+node.select("circle")
+  .on("mouseover", (event, d) => {
+    tooltip.transition().duration(150).style("opacity", 1);
+    tooltip.html(`${d.id} (${d.group})`)
+           .style("left", (event.pageX + 10) + "px")
+           .style("top", (event.pageY - 15) + "px");
+  })
+  .on("mouseout", () => tooltip.transition().duration(150).style("opacity", 0))
+  .on("click", (event, d) => {
+    if(d.url) window.open(d.url, "_blank");
+  });
+node.append("text")
+  .text(d => d.id)
+  .attr("text-anchor", "middle")
+  .attr("dy", 5);
+// Search functionality
+const searchInput = d3.select("#search");
+searchInput.on("input", function() {
+  const query = this.value.toLowerCase();
+
+  node.select("circle")
+    .transition().duration(200)
+    .attr("fill", d => {
+      if(d.id.toLowerCase().includes(query) && query !== "") {
+        return "grey"; // highlight color (yellow)
+      }
+    })
+    .attr("r", d => {
+      const textNode = d3.select(this.parentNode).select("text").node();
+      const bbox = textNode.getBBox();
+      let baseRadius = Math.max(bbox.width, bbox.height)/2 + 12;
+      return (d.id.toLowerCase().includes(query) && query !== "") ? baseRadius + 10 : baseRadius;
+    });
+
+  // Optional: fade non-matching nodes
+  node.transition().duration(200)
+      .style("opacity", d => {
+        if(query === "") return 1;
+        return d.id.toLowerCase().includes(query) ? 1 : 0.3;
+      });
+
+  link.transition().duration(200)
+      .style("opacity", d => {
+        if(query === "") return 0.6;
+        return (d.source.id.toLowerCase().includes(query) || d.target.id.toLowerCase().includes(query)) ? 0.8 : 0.1;
+      });
+});
+
+simulation.on("tick", () => {
+  link
+    .attr("x1", d => d.source.x)
+    .attr("y1", d => d.source.y)
+    .attr("x2", d => d.target.x)
+    .attr("y2", d => d.target.y);
+
+  node.attr("transform", d => {
+    // Bounce nodes off the edges
+    if(d.x < padding) { d.x = padding; d.vx *= -1; }
+    if(d.x > width - padding) { d.x = width - padding; d.vx *= -1; }
+    if(d.y < padding) { d.y = padding; d.vy *= -1; }
+    if(d.y > height - padding) { d.y = height - padding; d.vy *= -1; }
+
+    return `translate(${d.x},${d.y})`;
+  });
+});
+
+// Drag functions
+function dragstarted(event, d) {
+  if (!event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+
+function dragged(event, d) {
+  d.fx = event.x;
+  d.fy = event.y;
+}
+
+function dragended(event, d) {
+  if (!event.active) simulation.alphaTarget(0);
+  d.fx = null;
+  d.fy = null;
+}
+
+// Responsive
+window.addEventListener("resize", () => {
+  svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
+  simulation.force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
+  simulation.alpha(1).restart();
+});
+// Modal elements
+const modal = document.getElementById("modal");
+const modalTitle = document.getElementById("modal-title");
+const modalInfo = document.getElementById("modal-info");
+const modalLink = document.getElementById("modal-link");
+const modalClose = document.getElementById("modal-close");
+
+// Close modal
+modalClose.onclick = () => modal.style.display = "none";
+window.onclick = (event) => { if(event.target == modal) modal.style.display = "none"; };
+
+// Example click event for nodes
+node.select("circle").on("click", (event, d) => {
+  modalTitle.textContent = d.id;
+  modalInfo.textContent = d.info;
+  modalLink.href = d.url || "#";
+  modal.style.display = "flex";
+});
+</script>
+</body>
+</html>
