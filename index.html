@@ -220,12 +220,64 @@ margin: 0; padding: 0; box-sizing: border-box; }
     }
 
     .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-    .modal-content { background: #fff; margin: 10% auto; padding: 30px; border-radius: 12px; max-width: 600px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-    .modal-content h2 { font-family: 'Playfair Display', serif; color: #2E7D32; margin-bottom: 20px; }
-    .modal-content input, .modal-content textarea { width: 100%; margin-bottom: 12px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Inter', sans-serif; }
-    .modal-content button { background: linear-gradient(135deg, #2E7D32, #009688); color: #fff; border: none; border-radius: 30px; padding: 10px 20px; cursor: pointer; }
-    .modal-content button:hover { background: linear-gradient(135deg, #256029, #00796B); }
-    .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+.modal-content {
+  background: #fff;
+  margin: 10% auto;         /* centers modal vertically */
+  padding: 20px 30px;
+  border-radius: 12px;
+  max-width: 600px;        /* fixed width */
+  width: 90%;              /* responsive on smaller screens */
+  max-height: 80vh;        /* fixed height relative to viewport */
+  overflow-y: auto;        /* enable vertical scrolling for long forms */
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.modal-content h2 {
+  padding: 5%;
+  font-family: 'Playfair Display', serif;
+  text-align: center;
+  color: #2E7D32;
+  margin-bottom: 20px;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: 'Inter', sans-serif;
+}
+
+.modal-content button {
+  background: linear-gradient(135deg, #2E7D32, #009688);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.modal-content button:hover {
+  background: linear-gradient(135deg, #256029, #00796B);
+}
+
+/* Optional: smooth scrollbar for modern browsers */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(46,125,50,0.6);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+  border-radius: 4px;
+}    
+.close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
     .close:hover { color: #000; }
     nav.scrolled {
   background: rgba(255, 255, 255, 0.9);
@@ -296,7 +348,7 @@ transition: 0.5s;
     <div class="overlay">
       <h1>EarthMag</h1>
     <p>Exploring Earth Systems, Energy, and Sustainability for a Better Future.</p>
-      <a href="#internships" id="openFormBtn">Apply to Write</a>
+      <a id="openFormBtn">Apply to Write</a>
     </div>
   </header>
 
@@ -372,14 +424,36 @@ transition: 0.5s;
     <div class="modal-content">
       <span class="close">&times;</span>
       <h2>Apply to Write</h2>
-      <form>
-        <input type="text" placeholder="Your Name" required />
-        <input type="email" placeholder="Your Email" required />
-        <textarea placeholder="Why do you want to write for us?" required></textarea>
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+<form id="modalForm" action="https://formspree.io/f/mwpnbnzn" method="POST">
+  <!-- Section 1: Identity & Fun Intro -->
+  <h3>Let’s Get to Know You</h3>
+  <input type="text" name="name" placeholder="Full Name" required />
+  <input type="email" name="email" placeholder="Email" required />
+<div style="padding:2%"></div>
+  <!-- Section 2: Background & Interests -->
+  <h3>Tell Us About Yourself</h3>
+  <input type="text" name="education" placeholder="School/Uni" />
+  <input type="text" name="interests" placeholder="Topics that excite you" />
+<div style="padding:2%"></div>
+
+  <!-- Section 3: Experience & Creativity -->
+  <h3>Your Superpowers</h3>
+  <textarea name="experience" placeholder="Any prior writing, research, or cool projects? (optional)" rows="3"></textarea>
+  <textarea name="portfolio" placeholder="Links to blogs, articles, or other previous projects (optional)" rows="2"></textarea>
+  <textarea name="funfact" placeholder="One fun fact or quirky skill about you (optional)" rows="2"></textarea>
+<div style="padding:2%"></div>
+
+  <!-- Section 4: Motivation & Vision -->
+  <h3>Why You?</h3>
+  <textarea name="motivation" placeholder="Why do you want to write for EarthMag? What will you bring to the table?" rows="4" required></textarea>
+  <textarea name="dreamArticle" placeholder="Describe your dream article or topic you’d love to explore here" rows="2"></textarea>
+<div style="padding:2%"></div>
+
+  <button type="submit">Send My Application</button>
+  <div id="formResponse" style="margin-top:10px; color: green; display:none;">
+    Thanks! Your application has been received. We’ll get back to you soon.
   </div>
+</form></div>  </div>
 
 </div>
   <div class="custom-cursor" id="customCursor"></div>
@@ -421,13 +495,26 @@ transition: 0.5s;
 
       tryPlay();
 
-      const modal = document.getElementById('applyModal');
-      const btn = document.getElementById('openFormBtn');
-      const span = document.querySelector('.close');
-      btn.onclick = () => modal.style.display = 'block';
-      span.onclick = () => modal.style.display = 'none';
-      window.onclick = (event) => { if(event.target == modal) modal.style.display = 'none'; }
-      const logo = document.getElementById('logo');
+const modal = document.getElementById('applyModal');
+const btn = document.getElementById('openFormBtn');
+const span = document.querySelector('.close');
+
+// Open modal with button click
+btn.addEventListener('click', () => {
+  modal.style.display = 'block';
+});
+
+// Close modal when clicking the close span
+span.addEventListener('click', () => {
+  modal.style.display = 'none';
+});
+
+// Close modal when clicking outside the modal content
+window.addEventListener('click', (event) => {
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+});      const logo = document.getElementById('logo');
       logo.onclick = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       };
@@ -494,6 +581,35 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = indexLink.href;
       }, 500);
     });
+  }
+});
+const modalForm = document.getElementById('modalForm');
+const formResponse = document.getElementById('formResponse');
+
+modalForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(modalForm);
+
+  try {
+    const response = await fetch(modalForm.action, {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if (response.ok) {
+      formResponse.style.display = 'block';
+      modalForm.reset();
+    } else {
+      formResponse.style.color = 'red';
+      formResponse.textContent = 'Oops! Something went wrong.';
+      formResponse.style.display = 'block';
+    }
+  } catch (error) {
+    formResponse.style.color = 'red';
+    formResponse.textContent = 'Error submitting the form.';
+    formResponse.style.display = 'block';
   }
 });
 </script>
