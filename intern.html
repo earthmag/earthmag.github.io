@@ -51,7 +51,7 @@ margin: 0; padding: 0; box-sizing: border-box; }
       max-width: 90%;
       padding: 14px 28px;
       border-radius: 18px;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.15);
       backdrop-filter: blur(25px) saturate(180%);
       -webkit-backdrop-filter: blur(25px) saturate(180%);
       box-shadow: 0 8px 32px rgba(0,0,0,0.2);
@@ -251,8 +251,25 @@ transition: 0.5s;
 
     /* Repository Section Styles */
     .repo-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:16px; margin-bottom:35px; }
-    .repo-toolbar input, .repo-toolbar select { padding:12px 16px; border-radius:14px; border:1px solid rgba(0,0,0,0.1); font-size:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05); transition:all 0.3s ease; }
-    .repo-toolbar input:focus, .repo-toolbar select:focus { border-color:#2E7D32; box-shadow:0 4px 14px rgba(46,125,50,0.2); outline:none; }
+    .repo-toolbar input { padding:12px 16px; border-radius:14px; border:1px solid rgba(0,0,0,0.1); font-size:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05); transition:all 0.3s ease; }
+    .repo-toolbar select { 
+      padding:12px 16px; 
+      border-radius:14px; 
+      border:1px solid rgba(0,0,0,0.15); 
+      font-size:16px; 
+      background:rgba(255,255,255,0.7); 
+      backdrop-filter:blur(12px) saturate(160%); 
+      -webkit-backdrop-filter:blur(12px) saturate(160%); 
+      box-shadow:0 2px 8px rgba(0,0,0,0.08); 
+      transition:all 0.3s ease; 
+      appearance:none; 
+      background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232E7D32' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); 
+      background-repeat:no-repeat; 
+      background-position:right 12px center; 
+      background-size:16px; 
+      padding-right:40px;
+    }
+    .repo-toolbar input:focus, .repo-toolbar select:focus { border-color:#2E7D32; box-shadow:0 4px 14px rgba(46,125,50,0.25); outline:none; }
     .repo-toolbar button { background:#2E7D32; color:#fff; border:none; border-radius:50px; padding:12px 22px; font-weight:600; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s; }
     .repo-toolbar button:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.25); }
 
@@ -279,24 +296,32 @@ transition: 0.5s;
     box-shadow: 0 6px 20px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.4);
     transform: translateY(-2px);
     transition:0.5s    }
-  </style>
+    /* Slide animations */
+/* Slide in from right or left on page load */
+.slide-in-right { transform: translateX(100%); opacity: 0; }
+.slide-in-left  { transform: translateX(-100%); opacity: 0; }
+
+.slide-in-right.active,
+.slide-in-left.active { transform: translateX(0); opacity: 1; transition: transform 0.6s ease, opacity 0.6s ease; }
+
+.slide-out-left  { transform: translateX(-100%); opacity: 0; transition: transform 0.5s ease, opacity 0.5s ease; }
+.slide-out-right { transform: translateX(100%); opacity: 0; transition: transform 0.5s ease, opacity 0.5s ease; }  </style>
 </head>
 <body>
-
-  <!-- Navigation -->
-  <nav>
+    <nav>
     <a href="index.html" class="logo" id="logo">EarthMag</a>
     <ul>
       <li><a href="facts.html">Facts</a></li>
       <li><a href="data.html">Data</a></li>
       <li><a href="about.html">About</a></li>
-      <li><a class="activePage" href="intern.html">Internships</a></li>
+      <li><a href="intern.html" class="activePage">Internships</a></li>
       <li><a href="mailto:inquire.earthmagazine@gmail.com?subject=Inquiry%20from%20EarthMag%20Website&body=Hello%20EarthMag%20Team%2C%0A%0AI%20would%20like%20to%20learn%20more%20about%20your%20initiatives.%0A%0AThank%20you%2C%0A[Your%20Name]">Contact</a></li>
       <li><a href="blog.html">Blog</a></li>
-      <li><a href="journal.html">Journal</a></li>
+      <li><a href="journal.html" >Journal</a></li>
     </ul>
   </nav>
 
+<div class="slide-in" id="pageWrapper">
 <!-- Repository Section -->
 <section id="repository" style="padding: 100px 40px; background-color: #f9f9f9;">
   <h2 style="font-family:'Playfair Display',serif;font-size:48px;font-weight:700;text-transform:none;letter-spacing:-0.5px;margin-bottom:25px;background:#2E7D32;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Research Repository</h2>
@@ -364,6 +389,7 @@ transition: 0.5s;
     </div>
   </div>
 
+</div>
   <div class="custom-cursor" id="customCursor"></div>
 
 <script>
@@ -622,17 +648,44 @@ document.addEventListener('DOMContentLoaded', () => {
     window.onclick = (event) => { if(event.target == modal) modal.style.display = 'none'; }
   }
   // Navbar scroll effect
-  const navbar = document.querySelector("nav");
-  if (navbar) {
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > (window.innerHeight-50) || window.scrollY < 0) {
-        navbar.classList.add("scrolled");
-      } else {
-        navbar.classList.remove("scrolled");
-      }
-    });
-  }
-  // Custom cursor
+// Define a numeric order for pages
+// Define page order for directional transitions
+const pageOrder = {
+  "index.html": 1,
+  "facts.html": 2,
+  "data.html": 3,
+  "about.html": 4,
+  "intern.html": 5,
+  "blog.html": 6,
+  "journal.html": 7
+};
+
+// Determine current and previous page index
+const currentPage = window.location.pathname.split("/").pop();
+const prevIndex = sessionStorage.getItem('prevPageIndex') || 0;
+const currentIndex = pageOrder[currentPage] || 0;
+
+// Apply slide-in direction
+if (currentIndex >= prevIndex) pageWrapper.classList.add('slide-in-right');
+else pageWrapper.classList.add('slide-in-left');
+
+setTimeout(() => pageWrapper.classList.add('active'), 50);
+sessionStorage.setItem('prevPageIndex', currentIndex);
+
+// Animate link clicks
+document.querySelectorAll('nav ul li a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const targetPage = link.getAttribute('href');
+    const targetIndex = pageOrder[targetPage] || 0;
+
+    if (targetIndex > currentIndex) pageWrapper.classList.add('slide-out-left');
+    else pageWrapper.classList.add('slide-out-right');
+
+    setTimeout(() => { window.location.href = targetPage; }, 500);
+  });
+});  
+// Custom cursor
   const customCursor = document.getElementById('customCursor');
   if (customCursor) {
     document.addEventListener('mousemove', e => {
@@ -697,6 +750,65 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pdfFrame) pdfFrame.src = "";
     }
   });
+});
+</script>
+<script>
+// --- Google Sheets Repository Loader ---
+async function loadPapersFromSheet() {
+  try {
+    const sheetId = "YOUR_SHEET_ID";
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+    const response = await fetch(url);
+    const text = await response.text();
+    const json = JSON.parse(text.substr(47).slice(0,-2));
+    papers.length = 0;
+    json.table.rows.forEach(row => {
+      papers.push({
+        title: row.c[0]?.v || "",
+        authors: row.c[1]?.v ? row.c[1].v.split(",") : [],
+        abstract: row.c[2]?.v || "",
+        year: parseInt(row.c[3]?.v) || 0,
+        tags: row.c[4]?.v ? row.c[4].v.split(",") : [],
+        pdf: row.c[5]?.v || ""
+      });
+    });
+    renderPapers();
+  } catch (err) {
+    console.error("Failed to load Google Sheet:", err);
+  }
+}
+loadPapersFromSheet();
+document.addEventListener('DOMContentLoaded', () => {
+  const page = document.getElementById('pageWrapper');
+  
+  // Slide in on load
+  setTimeout(() => {
+    page.classList.add('active');
+  }, 50);
+
+  // Animate navigation to journal page (index.html)
+  const journalLink = document.querySelector('a[href="journal.html"]');
+  if(journalLink) {
+    journalLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      page.classList.add('slide-out');
+      setTimeout(() => {
+        window.location.href = journalLink.href;
+      }, 500); // matches CSS transition
+    });
+  }
+
+  // Optional: animate back to index from journal page
+  const indexLink = document.querySelector('a[href="index.html"]');
+  if(indexLink) {
+    indexLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      page.classList.add('slide-out');
+      setTimeout(() => {
+        window.location.href = indexLink.href;
+      }, 500);
+    });
+  }
 });
 </script>
 </body>

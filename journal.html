@@ -51,7 +51,7 @@ margin: 0; padding: 0; box-sizing: border-box; }
       max-width: 90%;
       padding: 14px 28px;
       border-radius: 18px;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.15);
       backdrop-filter: blur(25px) saturate(180%);
       -webkit-backdrop-filter: blur(25px) saturate(180%);
       box-shadow: 0 8px 32px rgba(0,0,0,0.2);
@@ -296,12 +296,19 @@ transition: 0.5s;
     box-shadow: 0 6px 20px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.4);
     transform: translateY(-2px);
     transition:0.5s    }
-  </style>
+    /* Slide animations */
+/* Slide in from right or left on page load */
+.slide-in-right { transform: translateX(100%); opacity: 0; }
+.slide-in-left  { transform: translateX(-100%); opacity: 0; }
+
+.slide-in-right.active,
+.slide-in-left.active { transform: translateX(0); opacity: 1; transition: transform 0.6s ease, opacity 0.6s ease; }
+
+.slide-out-left  { transform: translateX(-100%); opacity: 0; transition: transform 0.5s ease, opacity 0.5s ease; }
+.slide-out-right { transform: translateX(100%); opacity: 0; transition: transform 0.5s ease, opacity 0.5s ease; }  </style>
 </head>
 <body>
-
-  <!-- Navigation -->
-  <nav>
+    <nav>
     <a href="index.html" class="logo" id="logo">EarthMag</a>
     <ul>
       <li><a href="facts.html">Facts</a></li>
@@ -314,6 +321,7 @@ transition: 0.5s;
     </ul>
   </nav>
 
+<div class="slide-in" id="pageWrapper">
 <!-- Repository Section -->
 <section id="repository" style="padding: 100px 40px; background-color: #f9f9f9;">
   <h2 style="font-family:'Playfair Display',serif;font-size:48px;font-weight:700;text-transform:none;letter-spacing:-0.5px;margin-bottom:25px;background:#2E7D32;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Research Repository</h2>
@@ -381,6 +389,7 @@ transition: 0.5s;
     </div>
   </div>
 
+</div>
   <div class="custom-cursor" id="customCursor"></div>
 
 <script>
@@ -639,17 +648,44 @@ document.addEventListener('DOMContentLoaded', () => {
     window.onclick = (event) => { if(event.target == modal) modal.style.display = 'none'; }
   }
   // Navbar scroll effect
-  const navbar = document.querySelector("nav");
-  if (navbar) {
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > (window.innerHeight-50) || window.scrollY < 0) {
-        navbar.classList.add("scrolled");
-      } else {
-        navbar.classList.remove("scrolled");
-      }
-    });
-  }
-  // Custom cursor
+// Define a numeric order for pages
+// Define page order for directional transitions
+const pageOrder = {
+  "index.html": 1,
+  "facts.html": 2,
+  "data.html": 3,
+  "about.html": 4,
+  "intern.html": 5,
+  "blog.html": 6,
+  "journal.html": 7
+};
+
+// Determine current and previous page index
+const currentPage = window.location.pathname.split("/").pop();
+const prevIndex = sessionStorage.getItem('prevPageIndex') || 0;
+const currentIndex = pageOrder[currentPage] || 0;
+
+// Apply slide-in direction
+if (currentIndex >= prevIndex) pageWrapper.classList.add('slide-in-right');
+else pageWrapper.classList.add('slide-in-left');
+
+setTimeout(() => pageWrapper.classList.add('active'), 50);
+sessionStorage.setItem('prevPageIndex', currentIndex);
+
+// Animate link clicks
+document.querySelectorAll('nav ul li a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const targetPage = link.getAttribute('href');
+    const targetIndex = pageOrder[targetPage] || 0;
+
+    if (targetIndex > currentIndex) pageWrapper.classList.add('slide-out-left');
+    else pageWrapper.classList.add('slide-out-right');
+
+    setTimeout(() => { window.location.href = targetPage; }, 500);
+  });
+});  
+// Custom cursor
   const customCursor = document.getElementById('customCursor');
   if (customCursor) {
     document.addEventListener('mousemove', e => {
@@ -742,6 +778,38 @@ async function loadPapersFromSheet() {
   }
 }
 loadPapersFromSheet();
+document.addEventListener('DOMContentLoaded', () => {
+  const page = document.getElementById('pageWrapper');
+  
+  // Slide in on load
+  setTimeout(() => {
+    page.classList.add('active');
+  }, 50);
+
+  // Animate navigation to journal page (index.html)
+  const journalLink = document.querySelector('a[href="journal.html"]');
+  if(journalLink) {
+    journalLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      page.classList.add('slide-out');
+      setTimeout(() => {
+        window.location.href = journalLink.href;
+      }, 500); // matches CSS transition
+    });
+  }
+
+  // Optional: animate back to index from journal page
+  const indexLink = document.querySelector('a[href="index.html"]');
+  if(indexLink) {
+    indexLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      page.classList.add('slide-out');
+      setTimeout(() => {
+        window.location.href = indexLink.href;
+      }, 500);
+    });
+  }
+});
 </script>
 </body>
 </html>
