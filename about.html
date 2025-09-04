@@ -7,64 +7,15 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    * {   cursor: none !important;
-margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; color: #212121; background-color: #FAFAFA; cursor: none; /* hide default cursor */ }
-
-    a, button {
-      cursor: none !important; /* remove default pointer */
-    }
-    .footicon:hover {
-  transform: scale(1.2);
-  color: #1d1d1d;
-}
-
-    .custom-cursor {
-      width: 18px;
-      height: 18px;
-      border: 2px solid rgba(46,125,50,0.8);
-      border-radius: 50%;
-      position: fixed;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      transition: transform 0.15s ease-out, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
-      z-index: 3000;
-    }
-
-    .custom-cursor.click {
-      transform: translate(-50%, -50%) scale(0.8);
-      background-color: rgba(0,150,136,0.2);
-    }
-
-    .custom-cursor.hidden {
-      opacity: 0;
-    }
-
-    .custom-cursor.nav-hover {
-      transform: translate(-50%, -50%) scale(1.6);
-      background-color: rgba(0,150,136,0.1);
-      border-color: rgba(255, 255, 255,0.1);
-    }
-
-    nav {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: auto;
-      max-width: 90%;
-      padding: 14px 28px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.5) !important;
-      backdrop-filter: blur(25px) saturate(180%);
-      -webkit-backdrop-filter: blur(25px) saturate(180%);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 1000;
-      transition: all 0.3s ease;
-    }
+    * {cursor: none !important;margin: 0; padding: 0; box-sizing: border-box;}
+    body {font-family: 'Inter', sans-serif; color: #212121; background-color: #FAFAFA; cursor: none; /* hide default cursor */ }
+    a, button {cursor: none !important; /* remove default pointer */}
+    .footicon:hover {transform: scale(1.2);color: #1d1d1d;transition: all 0.3s ease;}
+    .custom-cursor {width: 18px;height: 18px;border: 2px solid rgba(46,125,50,0.8);border-radius: 50%;position: fixed;pointer-events: none;transform: translate(-50%, -50%);transition: transform 0.15s ease-out, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;z-index: 3000;}
+    .custom-cursor.click {transform: translate(-50%, -50%) scale(0.8);background-color: rgba(0,150,136,0.2);}
+    .custom-cursor.hidden {opacity: 0;}
+    .custom-cursor.nav-hover {transform: translate(-50%, -50%) scale(1.6);background-color: rgba(0,150,136,0.1);border-color: rgba(255, 255, 255,0.1);}
+    nav {position: fixed;top: 20px;left: 50%;transform: translateX(-50%);width: auto;max-width: 90%;padding: 14px 28px;border-radius: 18px;background: rgba(255,255,255,0.5) !important;backdrop-filter: blur(25px) saturate(180%);-webkit-backdrop-filter: blur(25px) saturate(180%);box-shadow: 0 8px 32px rgba(0,0,0,0.2);display: flex;justify-content: space-between;align-items: center;z-index: 1000;transition: all 0.3s ease;}
     nav .logo {
       font-family: 'Playfair Display', serif;
       font-weight: 800;

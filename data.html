@@ -58,7 +58,7 @@ margin: 0; padding: 0; box-sizing: border-box; }
       max-width: 90%;
       padding: 14px 28px;
       border-radius: 18px;
-      background: rgba(0, 0, 0, 0.15);
+      background: rgba(255,255,255, 0.55) !important;
       backdrop-filter: blur(25px) saturate(180%);
       -webkit-backdrop-filter: blur(25px) saturate(180%);
       box-shadow: 0 8px 32px rgba(0,0,0,0.2);
@@ -128,7 +128,6 @@ margin: 0; padding: 0; box-sizing: border-box; }
     }
 
     section {
-      padding: 100px 40px;
       background-color: #fff;
       transition: background-color 0.3s;
     }
@@ -139,13 +138,17 @@ margin: 0; padding: 0; box-sizing: border-box; }
       font-family: 'Playfair Display', serif;
       font-size: 40px;
       font-weight: 700;
-      text-transform: uppercase;
+      /* text-transform: ; */
       letter-spacing: 1px;
       margin-bottom: 20px;
       color: #2E7D32;
       border-bottom: 2px solid #2E7D32;
       padding-bottom: 8px;
       max-width: max-content;
+      text-align: center !important;
+      align-items: center;
+      align-self: center;
+      align-content: center;
     }
     section p {
       font-family: 'Inter', sans-serif;
@@ -299,7 +302,7 @@ transition: 0.5s;
 
     .activePage {
         color: black;
-    background: rgba(94, 94, 94, 0.15);
+    background: rgba(255,255,255, 0.55);
     box-shadow: 0 6px 20px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.4);
     transform: translateY(-2px);
     transition:0.5s    }
@@ -313,6 +316,8 @@ transition: 0.5s;
 
 .slide-out-left  { transform: translateX(-100%); opacity: 0; transition: transform 0.5s ease, opacity 0.5s ease; }
 .slide-out-right { transform: translateX(100%); opacity: 0; transition: transform 0.5s ease, opacity 0.5s ease; }  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
     <nav>
@@ -328,19 +333,97 @@ transition: 0.5s;
     </ul>
   </nav>
 
-<div class="slide-in" id="pageWrapper">
-<!-- Repository Section -->
-<section id="repository" style="padding: 100px 40px; background-color: #f9f9f9;">
-  <h2 style="font-family:'Playfair Display',serif;font-size:48px;font-weight:700;text-transform:none;letter-spacing:-0.5px;margin-bottom:25px;background:#2E7D32;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Research Repository</h2>
-  <div class="repo-toolbar">
-    <input type="text" id="repo-search" placeholder="Search by title, author, tags...">
-    <select id="repo-sort">
-      <option value="newest">Newest</option>
-      <option value="oldest">Oldest</option>
-      <option value="title">Title</option>
-    </select>
+<div  id="pageWrapper">
+<section id="data-dashboard" style="background: #fafafa; text-align: center !important; align-self: center;">
+    <div style="width:100% !important; padding: 0;">
+    <img src="https://www.primeit.pt/public/uploads/2023/08/a-primeira-página-na-world-wide-web-capa.jpg" alt="Earth from space" style="width:100vw; height:60vh; object-fit:cover; display:block;">
+    </div>
+
+    <h2 style="font-family:'Playfair Display',serif;font-size:44px;padding:5%;font-weight:800;letter-spacing:-0.5px; color:#2E7D32;text-align:center;border:none;">Earth Energy & Environmental Data Hub</h2>
+    <p style="text-align:center;max-width:900px;margin:0 auto 30px;font-size:18px;line-height:1.8;color:#444;">
+      A living dashboard curating up-to-date climate and energy insights. Explore global trends, check your local air quality in real time, and compare countries. Every chart is sourced and downloadable.
+    </p>
+
+    <!-- Controls Row -->
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;margin:0 auto 24px;">
+      <input id="country-search" type="text" placeholder="Search country…" style="padding:12px 14px;border-radius:12px;border:1px solid #d0d0d0;min-width:220px;font-size:15px;">
+      <select id="country-select" style="padding:12px 14px;border-radius:12px;border:1px solid #d0d0d0;font-size:15px;min-width:220px;">
+        <option value="World">World (default)</option>
+      </select>
+      <button id="download-current" style="background:#2E7D32;color:#fff;border:none;border-radius:28px;padding:12px 18px;font-weight:600;cursor:pointer;">Download Current Chart</button>
+      <button id="copy-link" style="background:#fff;color:#2E7D32;border:1px solid #2E7D32;border-radius:28px;padding:12px 18px;font-weight:600;cursor:pointer;">Share View</button>
+    </div>
+
+    <!-- KPI Cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:28px;">
+      <div style="background:#ffffff;border-radius:16px;padding:18px 18px 14px;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
+        <div style="font-size:13px;color:#666;margin-bottom:6px;">Current PM2.5 (your area)</div>
+        <div id="kpi-pm25" style="font-size:32px;font-weight:800;color:#2E7D32;">—</div>
+        <div id="kpi-location" style="font-size:12px;color:#777;margin-top:4px;">Detecting location…</div>
+      </div>
+      <div style="background:#ffffff;border-radius:16px;padding:18px 18px 14px;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
+        <div style="font-size:13px;color:#666;margin-bottom:6px;">Latest Global CO₂ Emissions (Mt)</div>
+        <div id="kpi-global-co2" style="font-size:32px;font-weight:800;color:#2E7D32;">—</div>
+        <div style="font-size:12px;color:#777;margin-top:4px;">From OWID (territorial)</div>
+      </div>
+      <div style="background:#ffffff;border-radius:16px;padding:18px 18px 14px;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
+        <div style="font-size:13px;color:#666;margin-bottom:6px;">Renewables Share of Electricity</div>
+        <div id="kpi-renew-share" style="font-size:32px;font-weight:800;color:#2E7D32;">—</div>
+        <div style="font-size:12px;color:#777;margin-top:4px;">World (latest year)</div>
+      </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div style="display:grid;grid-template-columns:1fr;gap:24px;">
+      <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
+          <h3 style="font-family:'Playfair Display',serif;color:#2E7D32;font-size:22px;margin:0;">CO₂ Emissions Trend</h3>
+          <div style="font-size:12px;color:#666;">Source: Our World in Data</div>
+        </div>
+        <canvas id="chart-co2" height="110"></canvas>
+      </div>
+
+      <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
+          <h3 style="font-family:'Playfair Display',serif;color:#2E7D32;font-size:22px;margin:0;">Renewables in Electricity Mix</h3>
+          <div style="font-size:12px;color:#666;">Source: Our World in Data</div>
+        </div>
+        <canvas id="chart-renew" height="110px"></canvas>
+      </div>
+      <div style="display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;">
+      <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,0.08); width: 40%;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
+          <h3 style="font-family:'Playfair Display',serif;color:#2E7D32;font-size:22px;margin:0;">Real‑Time Air Quality (PM2.5)</h3>
+          <div style="font-size:12px;color:#666;">Source: Open‑Meteo Air Quality API</div>
+        </div>
+        <canvas id="chart-aq" height="110px !important"></canvas>
+      </div>
+      <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,0.08); width: 40%;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
+          <h3 style="font-family:'Playfair Display',serif;color:#2E7D32;font-size:22px;margin:0;">Real‑Time Air Quality (PM2.5)</h3>
+          <div style="font-size:12px;color:#666;">Source: Open‑Meteo Air Quality API</div>
+        </div>
+        <canvas id="chart-aq" height="110px !important"></canvas>
+      </div>
+
+    </div>
+
+    <!-- Participation / Actions -->
+    <div style="margin-top:30px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;">
+      <button id="pledge-btn" style="background:#009688;color:#fff;border:none;border-radius:28px;padding:12px 18px;font-weight:600;cursor:pointer;">Make a Personal Climate Pledge</button>
+      <button id="export-pledge" style="background:#fff;color:#009688;border:1px solid #009688;border-radius:28px;padding:12px 18px;font-weight:600;cursor:pointer;">Export My Pledges</button>
+    </div>
+
+    <!-- Sources -->
+    <div style="margin-top:28px;font-size:14px;color:#555;">
+      <strong>Sources:</strong>
+      <ul style="margin-left:18px;line-height:1.8;">
+        <li>Our World in Data — CO₂ emissions: <a href="https://ourworldindata.org/co2-and-greenhouse-gas-emissions" target="_blank" rel="noopener">Methodology & data</a></li>
+        <li>Our World in Data — Electricity mix & renewables: <a href="https://ourworldindata.org/electricity-mix" target="_blank" rel="noopener">Methodology & data</a></li>
+        <li>Open‑Meteo Air Quality API: <a href="https://open-meteo.com/en/docs/air-quality-api" target="_blank" rel="noopener">API docs</a></li>
+      </ul>
+    </div>
   </div>
-  <div id="papers" style="display: flex; flex-wrap: wrap; gap: 28px;"></div>
 </section>
 
 <!-- Modal for PDF preview -->
@@ -407,248 +490,6 @@ transition: 0.5s;
 
 <script>
 // --- Repository Script ---
-const papers = [
-  {
-    title: "Sustainable Battery Storage in Urban Grids",
-    authors: ["Riya Sen", "Arjun Malhotra"],
-    abstract: "Explores the integration of next-gen battery storage for urban energy resilience.",
-    year: 2024,
-    tags: ["battery", "urban", "energy", "storage", "sustainability"],
-    pdf: "https://arxiv.org/pdf/2301.00001.pdf"
-  },
-  {
-    title: "Green Hydrogen: Challenges and Opportunities",
-    authors: ["Priya Das", "Sourav Banerjee"],
-    abstract: "A review of green hydrogen production and its role in decarbonization.",
-    year: 2023,
-    tags: ["hydrogen", "green", "energy", "review"],
-    pdf: "https://arxiv.org/pdf/2302.00002.pdf"
-  },
-  {
-    title: "Geothermal Innovations in India",
-    authors: ["Vikram Saha"],
-    abstract: "Case studies of geothermal energy projects across India.",
-    year: 2022,
-    tags: ["geothermal", "india", "case study", "renewable"],
-    pdf: "https://arxiv.org/pdf/2303.00003.pdf"
-  },
-  {
-    title: "Water-Energy Nexus: An Indian Perspective",
-    authors: ["Ananya Roy", "Rahul Verma"],
-    abstract: "Discusses the interdependence of water and energy sectors in India.",
-    year: 2024,
-    tags: ["water", "energy", "nexus", "india"],
-    pdf: "https://arxiv.org/pdf/2304.00004.pdf"
-  },
-  {
-    title: "Sustainable Battery Storage in Urban Grids",
-    authors: ["Riya Sen", "Arjun Malhotra"],
-    abstract: "Explores the integration of next-gen battery storage for urban energy resilience.",
-    year: 2024,
-    tags: ["battery", "urban", "energy", "storage", "sustainability"],
-    pdf: "https://arxiv.org/pdf/2301.00001.pdf"
-  },
-  {
-    title: "Green Hydrogen: Challenges and Opportunities",
-    authors: ["Priya Das", "Sourav Banerjee"],
-    abstract: "A review of green hydrogen production and its role in decarbonization.",
-    year: 2023,
-    tags: ["hydrogen", "green", "energy", "review"],
-    pdf: "https://arxiv.org/pdf/2302.00002.pdf"
-  },
-  {
-    title: "Geothermal Innovations in India",
-    authors: ["Vikram Saha"],
-    abstract: "Case studies of geothermal energy projects across India.",
-    year: 2022,
-    tags: ["geothermal", "india", "case study", "renewable"],
-    pdf: "https://arxiv.org/pdf/2303.00003.pdf"
-  },
-  {
-    title: "Water-Energy Nexus: An Indian Perspective",
-    authors: ["Ananya Roy", "Rahul Verma"],
-    abstract: "Discusses the interdependence of water and energy sectors in India.",
-    year: 2024,
-    tags: ["water", "energy", "nexus", "india"],
-    pdf: "https://arxiv.org/pdf/2304.00004.pdf"
-  },
-  {
-    title: "Sustainable Battery Storage in Urban Grids",
-    authors: ["Riya Sen", "Arjun Malhotra"],
-    abstract: "Explores the integration of next-gen battery storage for urban energy resilience.",
-    year: 2024,
-    tags: ["battery", "urban", "energy", "storage", "sustainability"],
-    pdf: "https://arxiv.org/pdf/2301.00001.pdf"
-  },
-  {
-    title: "Green Hydrogen: Challenges and Opportunities",
-    authors: ["Priya Das", "Sourav Banerjee"],
-    abstract: "A review of green hydrogen production and its role in decarbonization.",
-    year: 2023,
-    tags: ["hydrogen", "green", "energy", "review"],
-    pdf: "https://arxiv.org/pdf/2302.00002.pdf"
-  },
-  {
-    title: "Geothermal Innovations in India",
-    authors: ["Vikram Saha"],
-    abstract: "Case studies of geothermal energy projects across India.",
-    year: 2022,
-    tags: ["geothermal", "india", "case study", "renewable"],
-    pdf: "https://arxiv.org/pdf/2303.00003.pdf"
-  },
-  {
-    title: "Water-Energy Nexus: An Indian Perspective",
-    authors: ["Ananya Roy", "Rahul Verma"],
-    abstract: "Discusses the interdependence of water and energy sectors in India.",
-    year: 2024,
-    tags: ["water", "energy", "nexus", "india"],
-    pdf: "https://arxiv.org/pdf/2304.00004.pdf"
-  },
-  {
-    title: "Sustainable Battery Storage in Urban Grids",
-    authors: ["Riya Sen", "Arjun Malhotra"],
-    abstract: "Explores the integration of next-gen battery storage for urban energy resilience.",
-    year: 2024,
-    tags: ["battery", "urban", "energy", "storage", "sustainability"],
-    pdf: "https://arxiv.org/pdf/2301.00001.pdf"
-  },
-  {
-    title: "Green Hydrogen: Challenges and Opportunities",
-    authors: ["Priya Das", "Sourav Banerjee"],
-    abstract: "A review of green hydrogen production and its role in decarbonization.",
-    year: 2023,
-    tags: ["hydrogen", "green", "energy", "review"],
-    pdf: "https://arxiv.org/pdf/2302.00002.pdf"
-  },
-  {
-    title: "Geothermal Innovations in India",
-    authors: ["Vikram Saha"],
-    abstract: "Case studies of geothermal energy projects across India.",
-    year: 2022,
-    tags: ["geothermal", "india", "case study", "renewable"],
-    pdf: "https://arxiv.org/pdf/2303.00003.pdf"
-  },
-  {
-    title: "Water-Energy Nexus: An Indian Perspective",
-    authors: ["Ananya Roy", "Rahul Verma"],
-    abstract: "Discusses the interdependence of water and energy sectors in India.",
-    year: 2024,
-    tags: ["water", "energy", "nexus", "india"],
-    pdf: "https://arxiv.org/pdf/2304.00004.pdf"
-  },
-  {
-    title: "Sustainable Battery Storage in Urban Grids",
-    authors: ["Riya Sen", "Arjun Malhotra"],
-    abstract: "Explores the integration of next-gen battery storage for urban energy resilience.",
-    year: 2024,
-    tags: ["battery", "urban", "energy", "storage", "sustainability"],
-    pdf: "https://arxiv.org/pdf/2301.00001.pdf"
-  },
-  {
-    title: "Green Hydrogen: Challenges and Opportunities",
-    authors: ["Priya Das", "Sourav Banerjee"],
-    abstract: "A review of green hydrogen production and its role in decarbonization.",
-    year: 2023,
-    tags: ["hydrogen", "green", "energy", "review"],
-    pdf: "https://arxiv.org/pdf/2302.00002.pdf"
-  },
-  {
-    title: "Geothermal Innovations in India",
-    authors: ["Vikram Saha"],
-    abstract: "Case studies of geothermal energy projects across India.",
-    year: 2022,
-    tags: ["geothermal", "india", "case study", "renewable"],
-    pdf: "https://arxiv.org/pdf/2303.00003.pdf"
-  },
-  {
-    title: "Water-Energy Nexus: An Indian Perspective",
-    authors: ["Ananya Roy", "Rahul Verma"],
-    abstract: "Discusses the interdependence of water and energy sectors in India.",
-    year: 2024,
-    tags: ["water", "energy", "nexus", "india"],
-    pdf: "https://arxiv.org/pdf/2304.00004.pdf"
-  },
-  {
-    title: "Sustainable Battery Storage in Urban Grids",
-    authors: ["Riya Sen", "Arjun Malhotra"],
-    abstract: "Explores the integration of next-gen battery storage for urban energy resilience.",
-    year: 2024,
-    tags: ["battery", "urban", "energy", "storage", "sustainability"],
-    pdf: "https://arxiv.org/pdf/2301.00001.pdf"
-  },
-  {
-    title: "Green Hydrogen: Challenges and Opportunities",
-    authors: ["Priya Das", "Sourav Banerjee"],
-    abstract: "A review of green hydrogen production and its role in decarbonization.",
-    year: 2023,
-    tags: ["hydrogen", "green", "energy", "review"],
-    pdf: "https://arxiv.org/pdf/2302.00002.pdf"
-  },
-  {
-    title: "Geothermal Innovations in India",
-    authors: ["Vikram Saha"],
-    abstract: "Case studies of geothermal energy projects across India.",
-    year: 2022,
-    tags: ["geothermal", "india", "case study", "renewable"],
-    pdf: "https://arxiv.org/pdf/2303.00003.pdf"
-  },
-  {
-    title: "Water-Energy Nexus: An Indian Perspective",
-    authors: ["Ananya Roy", "Rahul Verma"],
-    abstract: "Discusses the interdependence of water and energy sectors in India.",
-    year: 2024,
-    tags: ["water", "energy", "nexus", "india"],
-    pdf: "https://arxiv.org/pdf/2304.00004.pdf"
-  }
-];
-
-let currentSearch = "";
-let currentSort = "newest";
-
-function renderPapers() {
-  const container = document.getElementById('papers');
-  if (!container) return;
-  let filtered = papers.filter(paper => {
-    const q = currentSearch.trim().toLowerCase();
-    if (!q) return true;
-    return (
-      paper.title.toLowerCase().includes(q) ||
-      paper.authors.join(' ').toLowerCase().includes(q) ||
-      paper.abstract.toLowerCase().includes(q) ||
-      (paper.tags && paper.tags.join(' ').toLowerCase().includes(q))
-    );
-  });
-  // Sort
-  if (currentSort === "newest") {
-    filtered = filtered.sort((a, b) => b.year - a.year);
-  } else if (currentSort === "oldest") {
-    filtered = filtered.sort((a, b) => a.year - b.year);
-  } else if (currentSort === "title") {
-    filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
-  }
-  // Render cards
-  container.innerHTML = "";
-  if (filtered.length === 0) {
-    container.innerHTML = "<div style='color:#888;font-size:18px;'>No papers found.</div>";
-    return;
-  }
-  for (const paper of filtered) {
-    const card = document.createElement('div');
-    card.className = "paper-card";
-    card.innerHTML = `
-      <h3>${paper.title}</h3>
-      <div class="authors">${paper.authors.map(a=>`<span style="color:#009688">${a}</span>`).join(', ')}</div>
-      <div class="abstract">${paper.abstract}</div>
-      <div class="meta">${paper.year} &bull; ${paper.tags.map(tag=>`<span class="tag">${tag}</span>`).join('')}</div>
-      <div class="actions">
-        <button class="preview-pdf-btn" data-pdf="${paper.pdf}" data-title="${paper.title.replace(/"/g,'&quot;')}">Preview PDF</button>
-        <a href="${paper.pdf}" target="_blank">Download</a>
-      </div>
-    `;
-    container.appendChild(card);
-  }
-}
-
 // Event listeners
 document.addEventListener('DOMContentLoaded', () => {
   // Modal for Apply to Write
@@ -837,4 +678,246 @@ hideCursorElements.forEach(el => {
 
 </script>
 </body>
+<script>
+(function(){
+  // Utility: CSV loader using PapaParse
+  function loadCSV(url){
+    return new Promise((resolve, reject)=>{
+      Papa.parse(url, { download: true, header: true, dynamicTyping: true, complete: (res)=> resolve(res.data), error: reject });
+    });
+  }
+
+  // Chart instances
+  let chartCO2, chartRenew, chartAQ;
+
+  // Elements
+  const countrySelect = document.getElementById('country-select');
+  const countrySearch = document.getElementById('country-search');
+  const kpiCo2 = document.getElementById('kpi-global-co2');
+  const kpiRenew = document.getElementById('kpi-renew-share');
+  const kpiPM25 = document.getElementById('kpi-pm25');
+  const kpiLoc = document.getElementById('kpi-location');
+
+  const CO2_URL = 'https://ourworldindata.org/grapher/co2.csv';
+  const RENEW_URL = 'https://ourworldindata.org/grapher/share-electricity-renewables.csv';
+
+  let co2DataByEntity = new Map();
+  let renewDataByEntity = new Map();
+
+  function groupByEntity(rows, entityKey='Entity'){
+    const map = new Map();
+    for(const r of rows){
+      const e = r[entityKey] || r['entity'] || r['Entity'] || r['Country'] || r['country'];
+      const y = r['Year'] || r['year'];
+      if(!e || y == null) continue;
+      if(!map.has(e)) map.set(e, []);
+      map.get(e).push(r);
+    }
+    for(const [e, arr] of map){ arr.sort((a,b)=> (a.Year||a.year) - (b.Year||b.year)); }
+    return map;
+  }
+
+  function setKPI(el, value, suffix=''){
+    if(!el) return;
+    if(value == null || isNaN(value)) { el.textContent = '—'; return; }
+    const num = Number(value);
+    const formatted = num >= 1000 ? (num/1000).toFixed(1) + 'k' : num.toLocaleString();
+    el.textContent = formatted + (suffix? ' ' + suffix : '');
+  }
+
+  function buildLineChart(ctx, labels, series, label){
+    if(!ctx) return null;
+    const existing = Chart.getChart(ctx);
+    if(existing) existing.destroy();
+    return new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: [{ label, data: series, tension: 0.25, fill: false }]},
+    });
+  }
+
+  function updateCO2Chart(entity){
+    const rows = co2DataByEntity.get(entity) || [];
+    const years = rows.map(r=> r.Year || r.year);
+    const values = rows.map(r=> r['Annual CO2 emissions'] || r['co2'] || r['CO2'] || r['value']);
+    chartCO2 = buildLineChart(document.getElementById('chart-co2'), years, values, entity + ' CO₂ (Mt)');
+    setKPI(kpiCo2, values && values.length ? values[values.length-1] : null);
+  }
+
+  function updateRenewChart(entity){
+    const rows = renewDataByEntity.get(entity) || [];
+    const years = rows.map(r=> r.Year || r.year);
+    const values = rows.map(r => r['Renewables (% electricity)'] ?? r['value']);
+    chartRenew = buildLineChart(document.getElementById('chart-renew'), years, values, entity + ' Renewables Share (%)');
+    setKPI(kpiRenew, values && values.length ? Number(values[values.length-1]).toFixed(1) : null, '%');
+  }
+
+  // Load datasets from OWID (CSV via CORS-friendly grapher endpoints)
+  async function initDatasets(){
+    try{
+      const [co2Rows, renewRows] = await Promise.all([
+        loadCSV(CO2_URL),
+        loadCSV(RENEW_URL)
+      ]);
+
+      co2DataByEntity = groupByEntity(co2Rows);
+      renewDataByEntity = groupByEntity(renewRows);
+
+      // Populate country selector
+      const entities = Array.from(new Set([...co2DataByEntity.keys(), ...renewDataByEntity.keys()])).sort();
+      for(const e of entities){
+        const opt = document.createElement('option');
+        opt.value = e; opt.textContent = e; countrySelect.appendChild(opt);
+      }
+
+      const defaultEntity = (new URLSearchParams(location.search)).get('entity') || 'World';
+      if([...countrySelect.options].some(o=>o.value===defaultEntity)) countrySelect.value = defaultEntity;
+
+      updateCO2Chart(countrySelect.value);
+      updateRenewChart(countrySelect.value);
+    } catch(err){
+      console.error('Dataset load failed', err);
+    }
+  }
+
+  // Country search filter
+  if(countrySearch){
+    countrySearch.addEventListener('input', ()=>{
+      const q = countrySearch.value.toLowerCase();
+      for(const opt of countrySelect.options){
+        opt.hidden = q && !opt.value.toLowerCase().includes(q);
+      }
+    });
+  }
+
+  if(countrySelect){
+    countrySelect.addEventListener('change', ()=>{
+      updateCO2Chart(countrySelect.value);
+      updateRenewChart(countrySelect.value);
+      const params = new URLSearchParams(location.search);
+      params.set('entity', countrySelect.value);
+      history.replaceState(null, '', location.pathname + '?' + params.toString());
+    });
+  }
+
+  // Download current chart (CO2, Renewables, or AQ)
+  document.getElementById('download-current')?.addEventListener('click', ()=>{
+    const charts = [
+      {id:'chart-co2', name:'co2'},
+      {id:'chart-renew', name:'renewables'},
+      {id:'chart-aq', name:'airquality'}
+    ];
+    for (const c of charts) {
+      const canvas = document.getElementById(c.id);
+      if (canvas) {
+        const chart = Chart.getChart(canvas);
+        if (chart) {
+          const url = canvas.toDataURL('image/png');
+          const a = document.createElement('a');
+          a.href = url; 
+          a.download = `earthmag-${(countrySelect?.value||'chart')}-${c.name}.png`;
+          a.click();
+          break;
+        }
+      }
+    }
+  });
+
+  // Share current view
+  document.getElementById('copy-link')?.addEventListener('click', async ()=>{
+    try{
+      await navigator.clipboard.writeText(location.href);
+      alert('Sharable link copied to clipboard!');
+    }catch(e){ alert('Copy failed. You can copy the URL bar manually.'); }
+  });
+
+  // Real-time Air Quality (Open-Meteo). Falls back to Kolkata if permission denied.
+  const FALLBACK = { lat: 22.5726, lon: 88.3639, name: 'Kolkata' };
+  function updateAQChart(pm25, pm10, aqi, label) {
+    const ctx = document.getElementById('chart-aq');
+    const existing = Chart.getChart(ctx);
+    if (existing) existing.destroy();
+    chartAQ = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [label],
+        datasets: [
+          {
+            label: 'PM2.5 (µg/m³)',
+            data: [pm25],
+            backgroundColor: 'rgba(46,125,50,0.6)',
+            borderColor: '#2E7D32',
+            borderWidth: 1
+          },
+          {
+            label: 'PM10 (µg/m³)',
+            data: [pm10],
+            backgroundColor: 'rgba(33,150,243,0.6)',
+            borderColor: '#2196F3',
+            borderWidth: 1
+          },
+          {
+            label: 'US AQI',
+            data: [aqi],
+            backgroundColor: 'rgba(255,152,0,0.6)',
+            borderColor: '#FF9800',
+            borderWidth: 1
+          }
+        ]
+      },
+    });
+  }
+
+  function fetchAQ(lat, lon, nameLabel){
+    const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm2_5,pm10,us_aqi`; 
+    fetch(url).then(r=>r.json()).then(d=>{
+      const cur = d.current || {}; 
+      const pm = cur.pm2_5; 
+      const pm10 = cur.pm10;
+      const aqi = cur.us_aqi;
+      setKPI(kpiPM25, pm, 'µg/m³');
+      if(kpiLoc) kpiLoc.textContent = nameLabel || `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+      // Show all three values in one chart
+      updateAQChart(pm, pm10, aqi, 'Now');
+    }).catch(()=>{
+      if(kpiLoc) kpiLoc.textContent = nameLabel + ' (AQ fetch failed)';
+    });
+  }
+
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        fetchAQ(pos.coords.latitude, pos.coords.longitude, 'Your location');
+      },
+      ()=>{ fetchAQ(FALLBACK.lat, FALLBACK.lon, FALLBACK.name); }
+    );
+  } else {
+    fetchAQ(FALLBACK.lat, FALLBACK.lon, FALLBACK.name);
+  }
+
+  // Simple pledge tracker (localStorage)
+  document.getElementById('pledge-btn')?.addEventListener('click', ()=>{
+    const option = prompt('What climate action will you take this month? (e.g., cycle to school 2x/week, reduce AC use by 1 hour/day, go meatless on Mondays)');
+    if(!option) return;
+    const key = 'earthmagPledges';
+    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    arr.push({ action: option, date: new Date().toISOString() });
+    localStorage.setItem(key, JSON.stringify(arr));
+    alert('Nice! Your pledge was saved locally. You can export it anytime.');
+  });
+
+  document.getElementById('export-pledge')?.addEventListener('click', ()=>{
+    const key = 'earthmagPledges';
+    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    if(arr.length === 0){ alert('No pledges yet. Make one!'); return; }
+    const csvHeader = 'date,action\n';
+    const csvBody = arr.map(r=> `${r.date},"${r.action.replace(/"/g,'\"')}"`).join('\n');
+    const blob = new Blob([csvHeader + csvBody], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'earthmag_pledges.csv'; a.click(); URL.revokeObjectURL(url);
+  });
+
+  // Kick off
+  initDatasets();
+})();
+</script>
 </html>
