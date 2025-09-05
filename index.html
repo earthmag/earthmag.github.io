@@ -35,7 +35,8 @@ margin: 0; padding: 0; box-sizing: border-box; }
 
     .custom-cursor.click {
       transform: translate(-50%, -50%) scale(0.8);
-      background-color: rgba(0,150,136,0.2);
+      background-color: rgba(0,150,136,0);
+      border: none;
     }
 
     .custom-cursor.hidden {
@@ -358,42 +359,140 @@ transition: 0.5s;
     </div>
   </header>
 
-  <!-- Sections -->
-  <section id="facts">
-    <h2>Energy and Environment Facts</h2>samkarn ilysm
-    <p>Key insights and data about sustainability, energy storage, and environmental engineering.</p>
+
+  <!-- Mission Showcase (Impact Strip) -->
+  <section id="impact-strip" style="padding: 60px 0 60px 0; background: linear-gradient(90deg, #e0f2f1 60%, #f1f8e9 100%); display: flex; justify-content: center; align-items: center;">
+    <div style="display: flex; gap: 80px; justify-content: center; width: 100%; max-width: 1200px;">
+      <div style="text-align: center;">
+        <div style="font-size: 42px; color: #2E7D32; font-weight: bold;">
+          <span class="counter" data-target="100000">0</span>+
+        </div>
+        <div style="font-size: 18px; color: #333; margin-top: 12px;">sq km forests lost<br>per year</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 42px; color: #009688; font-weight: bold;">
+          $<span class="counter" data-target="0.013">0</span>
+        </div>
+        <div style="font-size: 18px; color: #333; margin-top: 12px;">cheapest solar<br>energy ($/kWh)</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 42px; color: #1976D2; font-weight: bold;">
+          <span class="counter" data-target="30">0</span>%
+        </div>
+        <div style="font-size: 18px; color: #333; margin-top: 12px;">of CO₂ absorbed<br>by oceans</div>
+      </div>
+    </div>
   </section>
 
-  <section id="companies">
-    <h2>Companies</h2>
-    <p>Tracking leading innovators and organizations in energy and earth systems.</p>
+  <!-- Interactive Explore Earth Globe -->
+  <section id="globe-section" style="background: #e3f2fd;">
+    <h2 style="margin-bottom: 16px;">Explore the Earth</h2>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <div id="globeViz" style="width: 520px; height: 520px; border-radius: 50%; margin-bottom: 16px; position: relative;">
+        <div id="globeTooltip" style="position:absolute;pointer-events:none;display:none;padding:10px 14px;background:rgba(0,0,0,0.8);color:#fff;border-radius:8px;font-size:14px;max-width:260px;z-index:2000;">Tooltip</div>
+      </div>
+      <span style="font-size: 18px; color: #1976D2;">Hover hotspots to learn more</span>
+    </div>
   </section>
 
-  <section id="funding">
-    <h2>Funding</h2>
-    <p>Discover funding opportunities, grants, and programs supporting sustainability research.</p>
+  <!-- Featured Articles Carousel -->
+  <section id="featured-articles" style="background: #fff;">
+    <h2>Featured Articles</h2>
+    <div style="display: flex; gap: 32px; justify-content: center; flex-wrap: wrap;">
+      <div class="article-card" style="background: #f7fafc; border-radius: 14px; box-shadow: 0 4px 18px rgba(46,125,50,0.10); width: 300px; overflow: hidden; display: flex; flex-direction: column;">
+        <div style="background: #c8e6c9; height: 160px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-leaf" style="font-size: 54px; color: #2E7D32;"></i>
+        </div>
+        <div style="padding: 22px;">
+          <h3 style="font-size: 22px; font-family: 'Playfair Display', serif; margin-bottom: 10px;">The Race to Save Forests</h3>
+          <p style="font-size: 16px; color: #444;">How global efforts are fighting deforestation and restoring biodiversity.</p>
+          <a href="blog.html" style="margin-top: 12px; display: inline-block; color: #2E7D32; font-weight: 600;">Read more &rarr;</a>
+        </div>
+      </div>
+      <div class="article-card" style="background: #f7fafc; border-radius: 14px; box-shadow: 0 4px 18px rgba(46,125,50,0.10); width: 300px; overflow: hidden; display: flex; flex-direction: column;">
+        <div style="background: #b2dfdb; height: 160px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-solar-panel" style="font-size: 54px; color: #009688;"></i>
+        </div>
+        <div style="padding: 22px;">
+          <h3 style="font-size: 22px; font-family: 'Playfair Display', serif; margin-bottom: 10px;">Solar: The Cheapest Power Ever?</h3>
+          <p style="font-size: 16px; color: #444;">Exploring the plummeting costs and breakthroughs in solar energy tech.</p>
+          <a href="blog.html" style="margin-top: 12px; display: inline-block; color: #009688; font-weight: 600;">Read more &rarr;</a>
+        </div>
+      </div>
+      <div class="article-card" style="background: #f7fafc; border-radius: 14px; box-shadow: 0 4px 18px rgba(46,125,50,0.10); width: 300px; overflow: hidden; display: flex; flex-direction: column;">
+        <div style="background: #bbdefb; height: 160px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-water" style="font-size: 54px; color: #1976D2;"></i>
+        </div>
+        <div style="padding: 22px;">
+          <h3 style="font-size: 22px; font-family: 'Playfair Display', serif; margin-bottom: 10px;">Oceans: Our Carbon Sinks</h3>
+          <p style="font-size: 16px; color: #444;">The vital role oceans play in absorbing CO₂ and regulating climate.</p>
+          <a href="blog.html" style="margin-top: 12px; display: inline-block; color: #1976D2; font-weight: 600;">Read more &rarr;</a>
+        </div>
+      </div>
+      <div class="article-card" style="background: #f7fafc; border-radius: 14px; box-shadow: 0 4px 18px rgba(46,125,50,0.10); width: 300px; overflow: hidden; display: flex; flex-direction: column;">
+        <div style="background: #ffe0b2; height: 160px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-bolt" style="font-size: 54px; color: #ff9800;"></i>
+        </div>
+        <div style="padding: 22px;">
+          <h3 style="font-size: 22px; font-family: 'Playfair Display', serif; margin-bottom: 10px;">Storage: The Next Energy Revolution</h3>
+          <p style="font-size: 16px; color: #444;">How batteries and new tech are transforming the grid.</p>
+          <a href="blog.html" style="margin-top: 12px; display: inline-block; color: #ff9800; font-weight: 600;">Read more &rarr;</a>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <section id="about">
-    <h2>About Us</h2>
-    <p>EarthMag is a journal dedicated to energy, sustainability, and environmental science. Our mission is to amplify ideas and research that drive the transition to a sustainable future.</p>
+  <!-- Call to Action: Join Us -->
+  <section id="join-us" style="background: linear-gradient(135deg, #e8f5e9 60%, #b2dfdb 100%); text-align: center;">
+    <h2 style="border: none; color: #009688;">Join Us in Making a Difference</h2>
+    <p style="font-size: 22px; color: #333; margin-bottom: 32px;">Be part of our mission to inform, inspire, and drive change for a sustainable future.</p>
+    <button id="openFormBtn2" style="font-size: 20px; padding: 16px 38px; border-radius: 30px; background: linear-gradient(135deg, #2E7D32, #009688); color: #fff; font-weight: bold; border: none; box-shadow: 0 4px 16px rgba(46,125,50,0.15); cursor: pointer;">Apply to Write</button>
   </section>
 
-  <section id="internships">
-    <h2>Internships & Apply to Write</h2>
-    <p>We welcome student and professional writers to contribute to EarthMag. Share your voice on energy, sustainability, and environmental engineering.</p>
-    <button id="openFormBtn">Apply Now</button>
+  <!-- Community & Collaborators Showcase -->
+  <section id="community" style="background: #f1f8e9;">
+    <h2>Our Community & Collaborators</h2>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 36px; align-items: center; margin-top: 30px;">
+      <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(46,125,50,0.06); padding: 22px 36px; min-width: 140px; text-align: center;">
+        <i class="fas fa-school" style="font-size: 36px; color: #2E7D32;"></i>
+        <div style="margin-top: 10px; color: #333;">Green Schools</div>
+      </div>
+      <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(46,125,50,0.06); padding: 22px 36px; min-width: 140px; text-align: center;">
+        <i class="fas fa-university" style="font-size: 36px; color: #1976D2;"></i>
+        <div style="margin-top: 10px; color: #333;">Eco Research Labs</div>
+      </div>
+      <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(46,125,50,0.06); padding: 22px 36px; min-width: 140px; text-align: center;">
+        <i class="fas fa-users" style="font-size: 36px; color: #009688;"></i>
+        <div style="margin-top: 10px; color: #333;">Youth Writers</div>
+      </div>
+      <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(46,125,50,0.06); padding: 22px 36px; min-width: 140px; text-align: center;">
+        <i class="fas fa-leaf" style="font-size: 36px; color: #43A047;"></i>
+        <div style="margin-top: 10px; color: #333;">NGO Partners</div>
+      </div>
+      <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(46,125,50,0.06); padding: 22px 36px; min-width: 140px; text-align: center;">
+        <i class="fas fa-globe-asia" style="font-size: 36px; color: #FFB300;"></i>
+        <div style="margin-top: 10px; color: #333;">Global Allies</div>
+      </div>
+    </div>
   </section>
 
-
-  <section id="blog">
-    <h2>Blog</h2>
-    <p>Latest articles, stories, and insights on sustainability, energy, and earth systems.</p>
+  <!-- Fact of the Day Strip -->
+  <section id="fact-strip" style="background: linear-gradient(90deg, #e0f7fa, #f9fbe7); padding: 30px 0;">
+    <div id="factOfDay" style="max-width: 800px; margin: auto; background: #fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(46,125,50,0.07); padding: 26px 34px; display: flex; align-items: center; gap: 20px;">
+      <i class="fas fa-lightbulb" style="font-size: 38px; color: #ffd600;"></i>
+      <span id="factText" style="font-size: 18px; color: #333;">Loading a fact...</span>
+    </div>
   </section>
 
-  <section id="publishing">
-    <h2>Publishing</h2>
-    <p>EarthMag publishes articles from students, researchers, and professionals worldwide. Join us in shaping the conversation.</p>
+  <!-- Newsletter Signup -->
+  <section id="newsletter" style="background: #fff; text-align: center;">
+    <h2 style="color: #2E7D32;">Stay Updated</h2>
+    <p style="font-size: 18px; color: #444; margin-bottom: 22px;">Get the latest articles, facts, and news in your inbox.</p>
+    <form id="newsletterForm" style="display: inline-flex; gap: 10px; align-items: center; justify-content: center;">
+      <input type="email" name="email" placeholder="Your Email" required style="padding: 12px 18px; border-radius: 22px; border: 1px solid #ccc; font-size: 16px; min-width: 240px;">
+      <button type="submit" style="background: linear-gradient(135deg, #2E7D32, #009688); color: #fff; border: none; border-radius: 22px; padding: 12px 28px; font-size: 16px; font-weight: 600; cursor: pointer;">Subscribe</button>
+    </form>
+    <div id="newsletterResponse" style="margin-top: 10px; color: green; display: none;">Thank you for subscribing!</div>
   </section>
 
   <!-- Footer -->
@@ -509,13 +608,13 @@ transition: 0.5s;
       tryPlay();
 
 const modal = document.getElementById('applyModal');
-const btn = document.getElementById('openFormBtn');
+const btn1 = document.getElementById('openFormBtn');
+const btn2 = document.getElementById('openFormBtn2');
 const span = document.querySelector('.close');
 
-// Open modal with button click
-btn.addEventListener('click', () => {
-  modal.style.display = 'block';
-});
+// Open modal with either button click
+if(btn1) btn1.addEventListener('click', () => { modal.style.display = 'block'; });
+if(btn2) btn2.addEventListener('click', () => { modal.style.display = 'block'; });
 
 // Close modal when clicking the close span
 span.addEventListener('click', () => {
@@ -527,7 +626,67 @@ window.addEventListener('click', (event) => {
   if (event.target === modal) {
     modal.style.display = 'none';
   }
-});      const logo = document.getElementById('logo');
+});
+      const logo = document.getElementById('logo');
+
+// Mission Impact Counter Animation
+function animateCounter(el, target, duration = 1800, decimals = 0) {
+  let start = 0;
+  let startTime = null;
+  target = parseFloat(target);
+  function step(timestamp) {
+    if (!startTime) startTime = timestamp;
+    const progress = Math.min((timestamp - startTime) / duration, 1);
+    let value = start + (target - start) * progress;
+    if (decimals === 2) value = Math.round(value * 100) / 100;
+    else if (decimals === 3) value = Math.round(value * 1000) / 1000;
+    else value = Math.round(value);
+    el.textContent = value.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    }
+  }
+  requestAnimationFrame(step);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.counter').forEach(el => {
+    const target = el.getAttribute('data-target');
+    let decimals = 0;
+    if (target && target.includes('.')) decimals = target.split('.')[1].length;
+    animateCounter(el, target, 1800, decimals);
+  });
+});
+
+// Fact of the Day loader
+async function loadFactOfDay() {
+  try {
+    // Try to fetch facts.json from same directory
+    const response = await fetch('facts.json');
+    if (!response.ok) throw new Error('Could not load facts');
+    const facts = await response.json();
+    if (Array.isArray(facts) && facts.length > 0) {
+      const idx = Math.floor(Math.random() * facts.length);
+      document.getElementById('factText').textContent = facts[idx];
+    } else {
+      document.getElementById('factText').textContent = "Did you know? The Earth is full of surprises.";
+    }
+  } catch (e) {
+    document.getElementById('factText').textContent = "Did you know? The Earth is full of surprises.";
+  }
+}
+if (document.getElementById('factText')) loadFactOfDay();
+
+// Newsletter form handling (fake, just show thank you)
+const newsletterForm = document.getElementById('newsletterForm');
+const newsletterResponse = document.getElementById('newsletterResponse');
+if (newsletterForm && newsletterResponse) {
+  newsletterForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    newsletterResponse.style.display = 'block';
+    newsletterForm.reset();
+    setTimeout(() => { newsletterResponse.style.display = 'none'; }, 6000);
+  });
+}
       logo.onclick = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       };
@@ -636,6 +795,58 @@ hideCursorElements.forEach(el => {
   });
 });
 
+</script>
+
+<!-- Three.js and Globe.gl for interactive globe -->
+<script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+<script src="https://unpkg.com/globe.gl@2.28.5/dist/globe.gl.min.js"></script>
+
+<script>
+(function(){
+  const container = document.getElementById('globeViz');
+  if(!container) return;
+
+  const Globe = GlobeGL({ animateIn: true })(container)
+    .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
+    .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+    .backgroundImageUrl(null)
+    .showAtmosphere(true)
+    .atmosphereColor('#74c0ce')
+    .atmosphereAltitude(0.25)
+    .autoRotate(true)
+    .autoRotateSpeed(0.25);
+
+  const hotspots = [
+    { lat: -3.4653, lng: -62.2159, name: 'Amazon Basin' },
+    { lat: 23.4162, lng: 25.6628, name: 'Sahara Desert' },
+    { lat: 82.5015, lng: -62.3481, name: 'Arctic' },
+    { lat: -18.2871, lng: 147.6992, name: 'Great Barrier Reef' },
+    { lat: 22.5726, lng: 88.3639, name: 'Kolkata' },
+    { lat: 36.7783, lng: -119.4179, name: 'California' },
+    { lat: 64.1835, lng: -51.7216, name: 'Greenland' }
+  ];
+
+  fetch('facts.json').then(r=>r.json()).then(data => {
+    let factsArray = [];
+    if (Array.isArray(data)) factsArray = data;
+    else if (data.facts) factsArray = data.facts;
+    hotspots.forEach(h => {
+      const idx = Math.floor(Math.random()*factsArray.length);
+      const item = factsArray[idx];
+      h.fact = item.text || item;
+    });
+    const points = hotspots.map(h => ({ lat: h.lat, lng: h.lng, size: 0.6, name: h.name, fact: h.fact }));
+    Globe.pointsData(points).pointColor(()=>'orange').pointAltitude(0.05).pointRadius(0.6)
+      .onPointHover(pt => showTooltip(pt));
+  });
+
+  const tooltip = document.getElementById('globeTooltip');
+  function showTooltip(pt){
+    if(!pt){ tooltip.style.display='none'; return;}
+    tooltip.style.display='block';
+    tooltip.innerHTML = `<strong>${pt.name}</strong><div style="margin-top:6px;font-size:13px;color:#eee;">${pt.fact||''}</div>`;
+  }
+})();
 </script>
 </body>
 </html>
