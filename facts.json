@@ -260,7 +260,6 @@
       { "question": "What is a group of crows called?", "options": ["Murder", "Flock", "Swarm", "Pod"], "answer": "Murder" },
       { "question": "Which plant can 'hear' music?", "options": ["Some plants", "None", "All", "Only roses"], "answer": "Some plants" },
       { "question": "What is a group of jellyfish called?", "options": ["Smack", "School", "Pod", "Swarm"], "answer": "Smack" },
-      { "question": "Which animal can walk on land and swim?", "options": ["Mudskipper", "Goldfish", "Clownfish", "Dolphin"], "answer": "Mudskipper" },
       { "question": "What is a group of owls called?", "options": ["Parliament", "Murder", "Flock", "Swarm"], "answer": "Parliament" },
       { "question": "Which animal is the slowest?", "options": ["Three-toed sloth", "Rabbit", "Dog", "Horse"], "answer": "Three-toed sloth" },
       { "question": "What is a group of porcupines called?", "options": ["Prickle", "Herd", "Troop", "Swarm"], "answer": "Prickle" },
